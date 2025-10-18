@@ -1,0 +1,5 @@
+package co.edu.uco.ucochallenge.api.dto;
+
+public record TokenResponseDTO( String access_token ) {
+
+}

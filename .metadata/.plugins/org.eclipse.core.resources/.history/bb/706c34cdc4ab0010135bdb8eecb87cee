@@ -1,0 +1,22 @@
+package co.edu.uco.ucochallenge.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // Solo permite peticiones desde el Gateway (localhost)
+                .anyRequest().hasIpAddress("127.0.0.1") // 👈 solo el Gateway puede hablarle
+            );
+
+        return http.build();
+    }
+}

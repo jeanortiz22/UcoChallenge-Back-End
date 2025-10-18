@@ -1,0 +1,25 @@
+spring.application.name=UcoChallenge
+
+spring.datasource.url=jdbc:postgresql://ep-wild-block-ada7ly04-pooler.c-2.us-east-1.aws.neon.tech:5432/UcoChallenge
+spring.datasource.username=postgres
+spring.datasource.password=npg_Obc8GqkCBF3a
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# SSL obligatorio en Neon
+spring.datasource.hikari.data-source-properties.sslmode=require
+spring.datasource.hikari.data-source-properties.ssl=true
+
+logging.level.org.springframework.jdbc.core=DEBUG
+server.port=8080
+
+# 1. ISSUER URI: Dominio de tu Auth0. Spring Boot lo usa para encontrar las claves de validación.
+spring.security.oauth2.resourceserver.jwt.issuer-uri=https://dev-kkp1gdup1nvbr6qj.us.auth0.com/
+
+# 2. AUDIENCE: El identificador de tu API (Resource Server) definido en Auth0.
+spring.security.oauth2.resourceserver.jwt.audience=https://api.ucochallenge.com
+
+# 3. HABILITAR DECODER: Asegura que Spring Security use la configuración JWT.
+spring.security.oauth2.resourceserver.jwt.jwt-decoder-factory.enabled=true

@@ -1,0 +1,52 @@
+package co.edu.uco.ucochallenge.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            
+            // Configuración de autorización
+            .authorizeHttpRequests(auth -> auth
+                // Rutas públicas
+                .requestMatchers("/public/**", "/actuator/health").permitAll()
+                
+                // Todas las rutas de la API requieren autenticación
+                .requestMatchers("/api/**").authenticated()
+                
+                // Cualquier otra petición también requiere autenticación
+                .anyRequest().authenticated()
+            )
+            
+            // Configura como Resource Server con validación JWT
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.decoder(jwtDecoder()))  // Opcional: puedes customizar
+            )
+            
+            // Stateless - sin sesiones (típico para APIs REST)
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
+        
+        return http.build();
+    }
+    
+    // Opcional: Si necesitas customizar la validación del audience
+    @Bean
+    public org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder() {
+        // Spring Boot autoconfigura esto desde application.properties
+        // Solo necesitas este bean si quieres agregar validaciones extras
+        return org.springframework.security.oauth2.jwt.JwtDecoders
+            .fromIssuerLocation("https://dev-kkp1gdup1nvbr6qj.us.auth0.com/");
+    }
+}
