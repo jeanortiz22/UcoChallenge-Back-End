@@ -1,0 +1,5 @@
+package co.edu.uco.ucochallenge.api.dto;
+
+public record LoginRequestDTO( String email, String password ) {
+
+}

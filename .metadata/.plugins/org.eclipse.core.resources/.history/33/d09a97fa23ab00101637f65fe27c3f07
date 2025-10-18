@@ -1,0 +1,16 @@
+spring.application.name=UcoChallenge
+
+spring.datasource.url=jdbc:postgresql://ep-wild-block-ada7ly04-pooler.c-2.us-east-1.aws.neon.tech:5432/UcoChallenge
+spring.datasource.username=postgres
+spring.datasource.password=npg_Obc8GqkCBF3a
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# SSL obligatorio en Neon
+spring.datasource.hikari.data-source-properties.sslmode=require
+spring.datasource.hikari.data-source-properties.ssl=true
+
+logging.level.org.springframework.jdbc.core=DEBUG
+server.port=8080

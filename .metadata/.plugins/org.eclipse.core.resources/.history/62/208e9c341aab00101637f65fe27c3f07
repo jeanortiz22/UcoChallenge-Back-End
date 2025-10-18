@@ -1,0 +1,64 @@
+package co.edu.uco.ucochallenge.api.controller;
+
+import co.edu.uco.ucochallenge.api.dto.LoginRequestDTO;
+import co.edu.uco.ucochallenge.api.dto.TokenResponseDTO;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+@RestController
+@RequestMapping("/api//authn")
+public class AuthnController {
+	
+	private final UserDetailsService userDetailsService;
+	private final PasswordEncoder passwordEncoder;
+	
+	private static final String SECRET_KEY = "MiSecreto123";
+	private static final long EXPIRATION_TIME = 1000*60*60; //1 Hora
+
+	public AuthnController(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+		this.userDetailsService = userDetailsService;
+		this.passwordEncoder = passwordEncoder;
+	}
+	
+	@PostMapping("/token")
+    public ResponseEntity<TokenResponseDTO> authenticateUser(@RequestBody LoginRequestDTO loginRequest) {
+        
+        try {
+            // 1. Cargar usuario por email (UserDetailsService lo busca por su campo 'username' que definimos como email)
+            UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.email());
+            
+            // 2. Verificar la contraseña
+            if (!passwordEncoder.matches(loginRequest.password(), userDetails.getPassword())) {
+                return ResponseEntity.status(401).build(); // Contraseña incorrecta
+            }
+
+            // 3. Obtener roles
+            String roles = userDetails.getAuthorities().stream()
+                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
+                .collect(Collectors.joining(","));
+            
+            // 4. Generación del Token JWT
+            String token = Jwts.builder()
+                .setSubject(userDetails.getUsername()) 
+                .claim("roles", roles) 
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) 
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
+                .compact();
+
+            // 5. Devolver el token a Vue
+            return ResponseEntity.ok(new TokenResponseDTO(token));
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(401).build(); // Usuario no encontrado (401 Unauthorized)
+        }
+    }
+	}
+	
+}

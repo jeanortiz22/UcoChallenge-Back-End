@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+org.springframework.ide.eclipse.boot.wizard.PopularityTracker.cloud-gateway=1
+org.springframework.ide.eclipse.boot.wizard.PopularityTracker.oauth2-resource-server=1
+org.springframework.ide.eclipse.boot.wizard.PopularityTracker.security=1
+org.springframework.ide.eclipse.boot.wizard.PopularityTracker.webflux=1
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.artifactId=UcoChallengeGateway
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.bootVersion=3.5.6
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.description=Api Gateway del microservicio UcoChallenge
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.groupId=co.edu.uco.gateway
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.javaVersion=17
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.language=java
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.name=UcoChallengeGateway
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.packageName=co.edu.uco.gateway
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.packaging=jar
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.type=MAVEN
+org.springframework.ide.eclipse.boot.wizard.PreferredSelections.version=0.0.1-SNAPSHOT
+org.springframework.ide.eclipse.boot.wizard.initializr.url=https\://start.spring.io\n

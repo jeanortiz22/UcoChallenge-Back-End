@@ -1,0 +1,11 @@
+spring.application.name=UcoChallenge
+
+spring.r2dbc.url=r2dbc:postgresql://localhost:5432/UcoChallenge
+spring.r2dbc.username=postgres
+spring.r2dbc.password=npg_Obc8GqkCBF3a
+
+logging.level.org.springframework.r2dbc.core=DEBUG
+
+server.port=8080
+
+
