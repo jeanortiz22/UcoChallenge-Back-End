@@ -14,4 +14,6 @@ public final class ObjectHelper {
 	public static <O> O getDefault(final O object, final O defaultValue) {
 		return Objects.requireNonNullElse(object, defaultValue);
 	}
+	
+
 }

@@ -1,0 +1,26 @@
+spring.application.name=UcoChallenge
+
+spring.datasource.url=jdbc:postgresql://ep-wild-block-ada7ly04-pooler.c-2.us-east-1.aws.neon.tech:5432/UcoChallenge
+spring.datasource.username=postgres
+spring.datasource.password=$ {DB-PASSWORD}
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+spring.datasource.hikari.data-source-properties.sslmode=require
+spring.datasource.hikari.data-source-properties.ssl=true
+
+logging.level.org.springframework.jdbc.core=DEBUG
+server.port=8080
+
+server.address=127.0.0.1
+
+# Dominio de su Auth0.
+spring.security.oauth2.resourceserver.jwt.issuer-uri=https://dev-kkp1gdup1nvbr6qj.us.auth0.com/
+
+# El identificador de su API (Resource Server), que debe ser requerido por el decoder.
+spring.security.oauth2.resourceserver.jwt.audience=https://api.ucochallenge.com
+
+#Key azure
+#spring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-ucochallenge.vault.azure.net/
