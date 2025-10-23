@@ -1,5 +1,0 @@
-package co.edu.uco.ucochallenge.application.usecase.domain;
-
-public @interface RegisterUserDomain {
-
-}

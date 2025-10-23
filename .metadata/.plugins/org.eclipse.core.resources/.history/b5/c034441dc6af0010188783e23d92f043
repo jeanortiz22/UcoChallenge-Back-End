@@ -1,0 +1,18 @@
+package co.edu.uco.ucochallenge.user.registeruser.application.usecase;
+
+import org.springframework.stereotype.Service;
+
+import co.edu.uco.ucochallenge.application.usecase.UseCase;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+
+
+@Service
+public class RegisterUserUseCase implements UseCase<RegisterUserDomain, Void> {
+
+	@Override
+	public Void execute(final RegisterUserDomain domain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
