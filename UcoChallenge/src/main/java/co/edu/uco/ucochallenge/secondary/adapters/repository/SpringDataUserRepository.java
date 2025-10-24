@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.secondary.ports.repository;
+package co.edu.uco.ucochallenge.secondary.adapters.repository;
 
 import java.util.UUID;
 
@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, UUID> {
-
+public interface SpringDataUserRepository extends JpaRepository<UserEntity, UUID> {
 }
