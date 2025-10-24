@@ -1,33 +1,58 @@
 package co.edu.uco.ucochallenge.infrastructure.security;
 
-import jakarta.servlet.*;
+import java.io.IOException;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import java.io.IOException;
+import org.springframework.util.StringUtils;
 
 @Component
 public class GatewayOnlyFilter implements Filter {
 
-    private static final String GATEWAY_HEADER = "X-Gateway-Request";
-    private static final String GATEWAY_SECRET = "AdminUco2024";
+    private final String gatewayHeader;
+    private final String gatewaySecret;
+
+    public GatewayOnlyFilter(
+        @Value("${gateway.security.header:X-Gateway-Request}") final String gatewayHeader,
+        @Value("${gateway.security.secret:}") final String gatewaySecret) {
+        this.gatewayHeader = gatewayHeader;
+        this.gatewaySecret = gatewaySecret;
+    }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        
-        String gatewayHeader = httpRequest.getHeader(GATEWAY_HEADER);
-        
-        if (gatewayHeader == null || !GATEWAY_SECRET.equals(gatewayHeader)) {
-            httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            httpResponse.setContentType("application/json");
-            httpResponse.getWriter().write("{\"error\":\"Direct access not allowed. Use API Gateway.\"}");
+    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+        throws IOException, ServletException {
+
+        final HttpServletRequest httpRequest = (HttpServletRequest) request;
+        final HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        if (!requiresGatewayProtection(httpRequest)) {
+            chain.doFilter(request, response);
             return;
         }
-        
-        chain.doFilter(request, response);
+
+        if (StringUtils.hasText(gatewaySecret) && gatewaySecret.equals(httpRequest.getHeader(gatewayHeader))) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        httpResponse.setContentType("application/json");
+        httpResponse.getWriter().write("{\"error\":\"Direct access not allowed. Use API Gateway.\"}");
+        httpResponse.getWriter().flush();
+        return;
+    }
+
+    private boolean requiresGatewayProtection(final HttpServletRequest httpRequest) {
+        final String path = httpRequest.getRequestURI();
+        return !path.startsWith("/actuator");
     }
 }
