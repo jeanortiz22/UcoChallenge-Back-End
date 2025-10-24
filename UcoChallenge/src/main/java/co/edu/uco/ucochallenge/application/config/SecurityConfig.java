@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.config;
+package co.edu.uco.ucochallenge.application.config;
 
 import co.edu.uco.ucochallenge.infrastructure.security.GatewayOnlyFilter;
 import org.springframework.beans.factory.annotation.Value;
