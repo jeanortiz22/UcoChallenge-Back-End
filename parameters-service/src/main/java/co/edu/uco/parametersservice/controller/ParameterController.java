@@ -1,39 +1,46 @@
 package co.edu.uco.parametersservice.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import co.edu.uco.parametersservice.catalog.Parameter;
 import co.edu.uco.parametersservice.catalog.ParameterCatalog;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/parameters/api/v1/parameters")
 public class ParameterController {
 
-	
-	@GetMapping ("/{key}")
-	public ResponseEntity<Parameter> getParameter(@PathVariable String key) {
-		
-		var value = ParameterCatalog.getParameterValue(key);
-		
-		return new ResponseEntity<>(value, (value == null)  ? 
-				HttpStatus.NOT_FOUND : HttpStatus.OK);
-		}
-	
-	@PutMapping("/{key}")
-	public ResponseEntity<Void> updateParameter(@PathVariable String key, @RequestBody Parameter parameter) {
-	    if (!key.equals(parameter.getKey())) {
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	    }
+    // Obtener todos los parámetros
+    @GetMapping
+    public ResponseEntity<Map<String, Parameter>> getAllParameters() {
+        return ResponseEntity.ok(ParameterCatalog.getAllParameters());
+    }
 
-	    ParameterCatalog.synchronizeParameters(parameter);
-	    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
+    // Obtener un parámetro por su clave
+    @GetMapping("/{key}")
+    public ResponseEntity<Parameter> getParameterByKey(@PathVariable String key) {
+        Parameter parameter = ParameterCatalog.getParameterValue(key);
+        if (parameter == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(parameter);
+    }
 
+    // Actualizar o agregar un parámetro
+    @PutMapping("/{key}")
+    public ResponseEntity<Void> synchronizeParameter(@PathVariable String key, @RequestBody Parameter parameter) {
+        if (!key.equals(parameter.getKey())) {
+            return ResponseEntity.badRequest().build();
+        }
+        ParameterCatalog.synchronizeParameters(parameter);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Eliminar un parámetro
+    @DeleteMapping("/{key}")
+    public ResponseEntity<Void> deleteParameter(@PathVariable String key) {
+        ParameterCatalog.removeParameter(key);
+        return ResponseEntity.noContent().build();
+    }
 }

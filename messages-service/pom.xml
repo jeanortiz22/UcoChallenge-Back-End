@@ -12,11 +12,11 @@
     <relativePath/>
   </parent>
 
-  <groupId>co.edu.uco.parametersservice</groupId>
-  <artifactId>parameters-service</artifactId>
+  <groupId>co.edu.uco.messagesservice</groupId>
+  <artifactId>messages-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>parameters-service</name>
-  <description>Servicio de entrega de parámetros</description>
+  <name>messages-service</name>
+  <description>Servicio de catálogo de mensajes</description>
 
   <properties>
     <java.version>21</java.version>
@@ -29,7 +29,7 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- Seguridad + Resource Server (JWT de Auth0) -->
+    <!-- Seguridad con Auth0 (igual que parameters) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
@@ -46,7 +46,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Módulo compartido (excluimos JPA/JDBC/hibernate para no levantar DataSource) -->
+    <!-- Reutiliza lógica común (sin JPA) -->
     <dependency>
       <groupId>co.edu.uco.ucochallenge</groupId>
       <artifactId>uco-challenge</artifactId>
@@ -80,5 +80,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
