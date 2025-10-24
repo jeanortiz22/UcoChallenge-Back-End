@@ -2,53 +2,44 @@ package co.edu.uco.ucochallenge.infrastructure.security;
 
 import java.io.IOException;
 
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
-public class GatewayOnlyFilter implements Filter {
+public class GatewayOnlyFilter extends OncePerRequestFilter {
 
     private final String gatewayHeader;
     private final String gatewaySecret;
 
-    public GatewayOnlyFilter(
-        @Value("${gateway.security.header:X-Gateway-Request}") final String gatewayHeader,
-        @Value("${gateway.security.secret:}") final String gatewaySecret) {
+    public GatewayOnlyFilter(final String gatewayHeader, final String gatewaySecret) {
         this.gatewayHeader = gatewayHeader;
         this.gatewaySecret = gatewaySecret;
     }
 
     @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-        throws IOException, ServletException {
+    protected void doFilterInternal(
+        final HttpServletRequest request,
+        final HttpServletResponse response,
+        final FilterChain filterChain) throws ServletException, IOException {
 
-        final HttpServletRequest httpRequest = (HttpServletRequest) request;
-        final HttpServletResponse httpResponse = (HttpServletResponse) response;
-
-        if (!requiresGatewayProtection(httpRequest)) {
-            chain.doFilter(request, response);
+        if (!requiresGatewayProtection(request)) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        if (StringUtils.hasText(gatewaySecret) && gatewaySecret.equals(httpRequest.getHeader(gatewayHeader))) {
-            chain.doFilter(request, response);
+        if (StringUtils.hasText(gatewaySecret) && gatewaySecret.equals(request.getHeader(gatewayHeader))) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        httpResponse.setContentType("application/json");
-        httpResponse.getWriter().write("{\"error\":\"Direct access not allowed. Use API Gateway.\"}");
-        httpResponse.getWriter().flush();
-        return;
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\":\"Direct access not allowed. Use API Gateway.\"}");
+        response.getWriter().flush();
     }
 
     private boolean requiresGatewayProtection(final HttpServletRequest httpRequest) {

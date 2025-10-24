@@ -1,5 +1,6 @@
 package co.edu.uco.ucochallenge.config;
 
+import co.edu.uco.ucochallenge.infrastructure.security.GatewayOnlyFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -21,7 +23,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http, final GatewayOnlyFilter gatewayOnlyFilter)
+        throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -31,7 +34,16 @@ public class SecurityConfig {
             )
             .oauth2ResourceServer(oauth -> oauth.jwt());
 
+        http.addFilterBefore(gatewayOnlyFilter, BearerTokenAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    @Bean
+    public GatewayOnlyFilter gatewayOnlyFilter(
+        @Value("${gateway.security.header:X-Gateway-Request}") final String gatewayHeader,
+        @Value("${gateway.security.secret:}") final String gatewaySecret) {
+        return new GatewayOnlyFilter(gatewayHeader, gatewaySecret);
     }
 
     @Bean
