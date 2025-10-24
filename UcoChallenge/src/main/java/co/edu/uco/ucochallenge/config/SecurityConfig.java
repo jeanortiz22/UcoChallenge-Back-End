@@ -23,8 +23,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http, final GatewayOnlyFilter gatewayOnlyFilter)
-        throws Exception {
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http,
+                                                   final GatewayOnlyFilter gatewayOnlyFilter) throws Exception {
+
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -34,6 +35,7 @@ public class SecurityConfig {
             )
             .oauth2ResourceServer(oauth -> oauth.jwt());
 
+        // 🔥 BLOQUEA acceso directo al backend y solo permite API desde el Gateway
         http.addFilterBefore(gatewayOnlyFilter, BearerTokenAuthenticationFilter.class);
 
         return http.build();
