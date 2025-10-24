@@ -2,6 +2,7 @@ package co.edu.uco.ucochallenge.primary.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,13 +12,18 @@ import co.edu.uco.ucochallenge.user.registeruser.application.interactor.Register
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.RegisterUserInputDTO;
 
 @RestController
-@RequestMapping("/uco-challenge/api/v1/users")
+@RequestMapping("/api/v1/usuarios")
 public class UserController {
 
     private final RegisterUserInteractor registerUserInteractor;
 
     public UserController(final RegisterUserInteractor registerUserInteractor) {
         this.registerUserInteractor = registerUserInteractor;
+    }
+    
+    @GetMapping
+    public ResponseEntity<String> checkUsersEndpoint() {
+        return ResponseEntity.ok("User endpoint is available");
     }
 
     @PostMapping
