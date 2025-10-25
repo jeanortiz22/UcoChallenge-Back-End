@@ -100,8 +100,13 @@
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-identity</artifactId>
-		</dependency>	 
-		   
+		</dependency>
+
+		<dependency>
+			<groupId>co.edu.uco.gateway</groupId>
+			<artifactId>UcoChallengeGateway</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -2,8 +2,10 @@ package co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain;
 
 import java.util.UUID;
 
+import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeBusinessException;
 import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 import co.edu.uco.ucochallenge.crosscuting.helper.UUIDHelper;
+import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
 
 public final class RegisterUserDomain {
 
@@ -41,6 +43,7 @@ public final class RegisterUserDomain {
         this.email = email;
         this.mobileNumber = mobileNumber;
     }
+    
 
     public static RegisterUserDomain create(
         final UUID idType,
@@ -53,15 +56,43 @@ public final class RegisterUserDomain {
         final String email,
         final String mobileNumber) {
 
-        final var idTypeValidated = validateIdentifier(idType, "Identification type is required");
-        final var idNumberValidated = validateRequiredText(idNumber, "Identification number is required");
-        final var firstNameValidated = validateRequiredText(firstName, "First name is required");
+    	final var idTypeValidated = validateIdentifier(
+                idType,
+                RegisterUserMessageCode.ID_TYPE_REQUIRED,
+                "Identification type is required",
+                "idType");
+    	final var idNumberValidated = validateRequiredText(
+                idNumber,
+                RegisterUserMessageCode.ID_NUMBER_REQUIRED,
+                "Identification number is required",
+                "idNumber");
+    	final var firstNameValidated = validateRequiredText(
+                firstName,
+                RegisterUserMessageCode.FIRST_NAME_REQUIRED,
+                "First name is required",
+                "firstName");
         final var secondNameSanitized = TextHelper.getDefaultWithTrim(secondName);
-        final var firstSurnameValidated = validateRequiredText(firstSurname, "First surname is required");
+        final var firstSurnameValidated = validateRequiredText(
+                firstSurname,
+                RegisterUserMessageCode.FIRST_SURNAME_REQUIRED,
+                "First surname is required",
+                "firstSurname");
         final var secondSurnameSanitized = TextHelper.getDefaultWithTrim(secondSurname);
-        final var homeCityValidated = validateIdentifier(homeCity, "Home city is required");
-        final var emailValidated = validateRequiredText(email, "Email is required");
-        final var mobileNumberValidated = validateRequiredText(mobileNumber, "Mobile number is required");
+        final var homeCityValidated = validateIdentifier(
+                homeCity,
+                RegisterUserMessageCode.HOME_CITY_REQUIRED,
+                "Home city is required",
+                "homeCity");
+        final var emailValidated = validateRequiredText(
+                email,
+                RegisterUserMessageCode.EMAIL_REQUIRED,
+                "Email is required",
+                "email");
+        final var mobileNumberValidated = validateRequiredText(
+                mobileNumber,
+                RegisterUserMessageCode.MOBILE_NUMBER_REQUIRED,
+                "Mobile number is required",
+                "mobileNumber");
 
         return new RegisterUserDomain(
             UUID.randomUUID(),
@@ -76,18 +107,26 @@ public final class RegisterUserDomain {
             mobileNumberValidated);
     }
 
-    private static UUID validateIdentifier(final UUID value, final String message) {
+    private static UUID validateIdentifier(
+            final UUID value,
+            final String messageCode,
+            final String message,
+            final String fieldName) {
         final var sanitized = UUIDHelper.getDefault(value);
         if (UUIDHelper.getDefault().equals(sanitized)) {
-            throw new IllegalArgumentException(message);
+        	throw UcoChallengeBusinessException.create(messageCode, message, fieldName);
         }
         return sanitized;
     }
 
-    private static String validateRequiredText(final String value, final String message) {
+    private static String validateRequiredText(
+            final String value,
+            final String messageCode,
+            final String message,
+            final String fieldName) {
         final var sanitized = TextHelper.getDefaultWithTrim(value);
         if (TextHelper.isEmpty(sanitized)) {
-            throw new IllegalArgumentException(message);
+        	throw UcoChallengeBusinessException.create(messageCode, message, fieldName);
         }
         return sanitized;
     }

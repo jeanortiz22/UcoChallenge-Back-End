@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\ASUS\Desktop\IS2\ProyectoClaseEclipse\messages-service"/>
 			<item value="C:\Users\ASUS\Desktop\IS2\ProyectoClaseEclipse\UcoChallenge"/>
 		</list>
 		<list key="projectNameTemplate">

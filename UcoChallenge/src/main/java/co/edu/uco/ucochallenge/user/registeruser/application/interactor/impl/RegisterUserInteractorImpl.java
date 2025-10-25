@@ -3,11 +3,14 @@ package co.edu.uco.ucochallenge.user.registeruser.application.interactor.impl;
 import org.springframework.stereotype.Service;
 
 import co.edu.uco.ucochallenge.application.Void;
+import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
 import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.RegisterUserInteractor;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.RegisterUserInputDTO;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.RegisterUserUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
+
 import jakarta.transaction.Transactional;
 
 @Service
@@ -23,7 +26,9 @@ public class RegisterUserInteractorImpl implements RegisterUserInteractor {
     @Override
     public Void execute(final RegisterUserInputDTO dto) {
         if (ObjectHelper.isNull(dto)) {
-            throw new IllegalArgumentException("Register user input data is required");
+        	throw UcoChallengeApplicationException.create(
+                    RegisterUserMessageCode.INPUT_DATA_REQUIRED,
+                    "Register user input data is required");
         }
 
         final var domain = RegisterUserDomain.create(
