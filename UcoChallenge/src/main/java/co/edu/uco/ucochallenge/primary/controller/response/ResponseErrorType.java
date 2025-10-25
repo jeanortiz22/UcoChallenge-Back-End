@@ -6,3 +6,4 @@ public enum ResponseErrorType {
     TECHNICAL,
     UNKNOWN
 }
+

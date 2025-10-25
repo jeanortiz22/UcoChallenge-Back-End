@@ -1,54 +1,67 @@
 package co.edu.uco.ucochallenge.primary.controller;
 
+import java.time.Instant;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
-import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
-import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeBusinessException;
-import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeException;
-import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeTechnicalException;
-import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
+import co.edu.uco.ucochallenge.crosscuting.exception.*;
+import co.edu.uco.ucochallenge.crosscuting.messages.MessageCatalogPort;
 import co.edu.uco.ucochallenge.primary.controller.response.ResponseError;
 import co.edu.uco.ucochallenge.primary.controller.response.ResponseErrorType;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
 
+    private final MessageCatalogPort catalog;
+
+    // ✅ Constructor MANUAL para inyección por constructor
+    public ApiExceptionHandler(MessageCatalogPort catalog) {
+        this.catalog = catalog;
+    }
+
     @ExceptionHandler(UcoChallengeBusinessException.class)
-    public ResponseEntity<ResponseError> handleBusinessException(final UcoChallengeBusinessException exception) {
+    public ResponseEntity<ResponseError> handleBusiness(final UcoChallengeBusinessException exception) {
         return buildResponse(exception, HttpStatus.BAD_REQUEST, ResponseErrorType.BUSINESS);
     }
 
     @ExceptionHandler(UcoChallengeApplicationException.class)
-    public ResponseEntity<ResponseError> handleApplicationException(final UcoChallengeApplicationException exception) {
-        return buildResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, ResponseErrorType.APPLICATION);
+    public ResponseEntity<ResponseError> handleApplication(final UcoChallengeApplicationException exception) {
+        return buildResponse(exception, HttpStatus.BAD_REQUEST, ResponseErrorType.APPLICATION);
     }
 
     @ExceptionHandler(UcoChallengeTechnicalException.class)
-    public ResponseEntity<ResponseError> handleTechnicalException(final UcoChallengeTechnicalException exception) {
+    public ResponseEntity<ResponseError> handleTechnical(final UcoChallengeTechnicalException exception) {
         return buildResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, ResponseErrorType.TECHNICAL);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseError> handleUnexpectedException(final Exception exception) {
-        final var response = ResponseError.of(
-            TextHelper.getDefault(exception.getMessage()),
-            TextHelper.EMPTY,
-            List.of(),
-            ResponseErrorType.UNKNOWN);
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ResponseError> handleUnexpected(final Exception exception) {
+        var body = new ResponseError(
+                "Ha ocurrido un error inesperado.",
+                "UNEXPECTED_ERROR",
+                List.of(),
+                ResponseErrorType.UNKNOWN,
+                Instant.now().toString()
+        );
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<ResponseError> buildResponse(
-        final UcoChallengeException exception,
-        final HttpStatus status,
-        final ResponseErrorType type) {
+            final UcoChallengeException ex,
+            final HttpStatus status,
+            final ResponseErrorType type) {
 
-        final var response = ResponseError.fromException(exception, type);
-        return new ResponseEntity<>(response, status);
+        var resolved = catalog.format(ex.getMessageCode(), ex.getParameters().toArray());
+
+        var body = new ResponseError(
+                resolved,
+                ex.getMessageCode(),
+                ex.getParameters(),
+                type,
+                Instant.now().toString()
+        );
+        return new ResponseEntity<>(body, status);
     }
 }
