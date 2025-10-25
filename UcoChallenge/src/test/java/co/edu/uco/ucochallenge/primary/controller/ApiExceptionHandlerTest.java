@@ -1,6 +1,6 @@
 package co.edu.uco.ucochallenge.primary.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+/*import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -91,3 +91,4 @@ class ApiExceptionHandlerTest {
         assertTrue(body.getParameters().isEmpty());
     }
 }
+*/

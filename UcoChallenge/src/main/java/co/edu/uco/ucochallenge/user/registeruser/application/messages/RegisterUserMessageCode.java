@@ -13,5 +13,8 @@ public final class RegisterUserMessageCode {
     public static final String MOBILE_NUMBER_REQUIRED = "user.register.mobile.required";
 
     private RegisterUserMessageCode() {
+    	
+    	
+    	
     }
 }

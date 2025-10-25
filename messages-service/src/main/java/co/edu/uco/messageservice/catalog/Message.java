@@ -1,31 +1,17 @@
+// Message.java
 package co.edu.uco.messageservice.catalog;
 
-public class Message {
+public final class Message {
+    private final String key;       // p.ej. "EMAIL_TAKEN"
+    private final String template;  // p.ej. "El correo {0} ya está registrado."
 
-    private String key;    // p.ej. "USUARIO_CREADO_OK"
-    private String text;   // p.ej. "Usuario creado exitosamente"
-    private String locale; // p.ej. "es-CO"
-
-    public Message() { }
-
-    public Message(String key, String text) {
-        this(key, text, "es-CO");
-    }
-
-    public Message(String key, String text, String locale) {
-        setKey(key);
-        setText(text);
-        setLocale(locale);
+    public Message(String key, String template) {
+        if (key == null || key.isBlank()) throw new IllegalArgumentException("key is required");
+        if (template == null || template.isBlank()) throw new IllegalArgumentException("template is required");
+        this.key = key.trim();
+        this.template = template;
     }
 
     public String getKey() { return key; }
-    public void setKey(String key) { this.key = key; }
-
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
-
-    public String getLocale() { return locale; }
-    public void setLocale(String locale) {
-        this.locale = (locale == null || locale.isBlank()) ? "es-CO" : locale;
-    }
+    public String getTemplate() { return template; }
 }
