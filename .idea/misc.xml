@@ -6,6 +6,8 @@
       <list>
         <option value="$PROJECT_DIR$/parameters-service/pom.xml" />
         <option value="$PROJECT_DIR$/UcoChallenge/pom.xml" />
+        <option value="$PROJECT_DIR$/messages-service/pom.xml" />
+        <option value="$PROJECT_DIR$/UcoChallengeGateway/pom.xml" />
       </list>
     </option>
   </component>

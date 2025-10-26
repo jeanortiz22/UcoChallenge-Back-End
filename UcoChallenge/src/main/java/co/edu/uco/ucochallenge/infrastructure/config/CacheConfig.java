@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.infrastructure.security.config;
+package co.edu.uco.ucochallenge.infrastructure.config;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;

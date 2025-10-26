@@ -6,6 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="messages-service" />
+        <module name="UcoChallengeGateway" />
         <module name="parameters-service" />
         <module name="uco-challenge" />
       </profile>
@@ -13,6 +15,8 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="UcoChallengeGateway" options="-parameters" />
+      <module name="messages-service" options="-parameters" />
       <module name="parameters-service" options="-parameters" />
       <module name="uco-challenge" options="-parameters" />
     </option>

@@ -47,12 +47,15 @@ public class GatewayOnlyFilter extends OncePerRequestFilter {
         }
 
         logDeniedRequest(request, headerValue);
-        writeJsonForbiddenResponse(response);
+        writeJsonUnauthorizedResponse(response, request.getRequestURI());
     }
 
     private boolean requiresGatewayProtection(final HttpServletRequest httpRequest) {
         final String path = httpRequest.getRequestURI();
-        return !path.startsWith("/actuator");
+        // Abre actuator (y swagger si corresponde)
+        return !path.startsWith("/actuator")
+                && !path.startsWith("/v3/api-docs")
+                && !path.startsWith("/swagger-ui");
     }
 
     private void logDeniedRequest(final HttpServletRequest request, final String headerValue) {
@@ -70,16 +73,17 @@ public class GatewayOnlyFilter extends OncePerRequestFilter {
         );
     }
 
-    private void writeJsonForbiddenResponse(final HttpServletResponse response) throws IOException {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    // 401 (no autenticado) si falta/incorrecto el header
+    private void writeJsonUnauthorizedResponse(final HttpServletResponse response, final String path) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json; charset=UTF-8");
 
         final Map<String, Object> errorBody = Map.of(
                 "timestamp", LocalDateTime.now().toString(),
-                "status", 403,
-                "error", "Forbidden",
+                "status", 401,
+                "error", "Unauthorized",
                 "message", "Acceso directo no permitido. Debe consumir la API a través del Gateway.",
-                "path", "/"
+                "path", path
         );
 
         response.getWriter().write(mapper.writeValueAsString(errorBody));

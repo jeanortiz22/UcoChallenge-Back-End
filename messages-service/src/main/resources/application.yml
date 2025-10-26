@@ -9,3 +9,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://dev-kkp1gdup1nvbr6qj.us.auth0.com/  # tu tenant Auth0
+
+
+gateway:
+  security:
+    header: X-Gateway-Request
+    secret: AdminUco2024
