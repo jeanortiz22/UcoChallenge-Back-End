@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.primary.exeption;
+package co.edu.uco.ucochallenge.primary.exception;
 
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeBusinessException;

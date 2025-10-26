@@ -4,12 +4,8 @@ server:
 spring:
   application:
     name: messages-service
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://dev-kkp1gdup1nvbr6qj.us.auth0.com/  # tu tenant Auth0
 
+# ❌ Quita por completo la sección oauth2.resourceserver.jwt
 
 gateway:
   security:
