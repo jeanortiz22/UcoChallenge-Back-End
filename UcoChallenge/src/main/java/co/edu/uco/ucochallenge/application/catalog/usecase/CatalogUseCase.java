@@ -1,0 +1,19 @@
+package co.edu.uco.ucochallenge.application.catalog.usecase;
+
+import java.util.List;
+import java.util.UUID;
+
+import co.edu.uco.ucochallenge.application.catalog.usecase.domain.CatalogItemDomain;
+import co.edu.uco.ucochallenge.application.catalog.usecase.domain.CityDomain;
+import co.edu.uco.ucochallenge.application.catalog.usecase.domain.StateDomain;
+
+public interface CatalogUseCase {
+
+    List<CatalogItemDomain> listIdTypes();
+
+    List<CatalogItemDomain> listCountries();
+
+    List<StateDomain> listStates(UUID countryId);
+
+    List<CityDomain> listCities(UUID stateId);
+}
