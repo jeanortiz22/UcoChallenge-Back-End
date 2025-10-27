@@ -1,5 +1,0 @@
-package co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto;
-
-public record RegisterUserDTO() {
-
-}
