@@ -9,6 +9,6 @@ import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.Regi
 @Mapper(componentModel = "spring")
 public interface RegisterUserInputMapper {
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id", ignore = true) // El domain genera el ID internamente
     RegisterUserInputDomain toDomain(RegisterUserInputDTO dto);
 }

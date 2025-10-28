@@ -16,30 +16,17 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>UcoChallenge</name>
   <description>Aplicación reto que pretende que cada equipo de trabajo aplique prácticas y adopción de engoques modernos en la construcción de aplicaciones disrtribuidas para la nube.</description>
-  <url/>
-  <licenses>
-    <license/>
-  </licenses>
-  <developers>
-    <developer/>
-  </developers>
-  <scm>
-    <connection/>
-    <developerConnection/>
-    <tag/>
-    <url/>
-  </scm>
 
   <properties>
-        <java.version>21</java.version>
-        <azure.version>5.18.0</azure.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-	    <!-- Solo añadimos codificación -->
-	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>21</java.version>
+    <azure.version>5.18.0</azure.version>
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <lombok.version>1.18.34</lombok.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <!-- (Azure) -->
+  <!-- Azure BOM -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -53,69 +40,64 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- Spring -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
-
-
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-
-    <!-- NUEVO: WebFlux para usar WebClient -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
-
-    <!-- NUEVO: Spring Cache simple (ConcurrentMapCache) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-cache</artifactId>
     </dependency>
-
+    
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
+      <groupId>com.notificationapi</groupId>
+      <artifactId>notificationapi-java-server-sdk</artifactId>
+      <version>0.3.0</version>
     </dependency>
 
-    <!-- Seguridad con Spring Boot y OAuth2 Resource Server -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
+    </dependency>
+
+    <!-- Seguridad / JWT -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
     </dependency>
-
-    <!-- Validación de tokens JWT -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-oauth2-jose</artifactId>
     </dependency>
 
-    <!-- (Azure) se deja EXACTAMENTE igual -->
+    <!-- Azure Key Vault -->
     <dependency>
       <groupId>com.azure.spring</groupId>
       <artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
@@ -125,25 +107,37 @@
       <artifactId>azure-identity</artifactId>
     </dependency>
 
+    <!-- MapStruct API -->
     <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${mapstruct.version}</version>
     </dependency>
 
+    <!-- Lombok + binding para MapStruct (no runtime) -->
     <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
-            <scope>provided</scope>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
     </dependency>
-    
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok-mapstruct-binding</artifactId>
+      <version>0.2.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Tests -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
-    <!-- NUEVO: configurar resources para NO filtrar YAML/YML -->
     <resources>
-      <!-- 1) YML/YAML sin filtrado -->
       <resource>
         <directory>src/main/resources</directory>
         <filtering>false</filtering>
@@ -152,9 +146,6 @@
           <include>**/*.yaml</include>
         </includes>
       </resource>
-
-      <!-- 2) .properties sin filtrado (más seguro).
-           Si en el futuro quieres reemplazar variables aquí, cambia filtering a true. -->
       <resource>
         <directory>src/main/resources</directory>
         <filtering>false</filtering>
@@ -162,8 +153,6 @@
           <include>**/*.properties</include>
         </includes>
       </resource>
-
-      <!-- 3) Resto sin filtrar -->
       <resource>
         <directory>src/main/resources</directory>
         <filtering>false</filtering>
@@ -176,25 +165,42 @@
     </resources>
 
     <plugins>
-		<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-compiler-plugin</artifactId>
-		        <configuration>
-		                <annotationProcessorPaths>
-		                        <path>
-		                                <groupId>org.mapstruct</groupId>
-		                                <artifactId>mapstruct-processor</artifactId>
-		                                <version>${mapstruct.version}</version>
-		                        </path>
-		                </annotationProcessorPaths>
-		        </configuration>
-		</plugin>
-		<plugin>
-		        <groupId>org.springframework.boot</groupId>
-		        <artifactId>spring-boot-maven-plugin</artifactId>
-	  </plugin>
-	  
-      <!-- NUEVO: asegurar encoding y delimitadores por defecto -->
+      <!-- Compilador con APT correcto -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok-mapstruct-binding</artifactId>
+              <version>0.2.0</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -206,5 +212,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

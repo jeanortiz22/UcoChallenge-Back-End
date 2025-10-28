@@ -16,9 +16,8 @@ public interface RegisterUserEntityMapper {
 
     @Mapping(source = "idType",   target = "idType")     // UUID -> IdTypeEntity
     @Mapping(source = "homeCity", target = "homeCity")   // UUID -> CityEntity
-    @Mapping(target = "id", ignore = true)
 
-    // evita el error
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "emailConfirmed", ignore = true)
     @Mapping(target = "mobileNumberConfirmed", ignore = true)
 
