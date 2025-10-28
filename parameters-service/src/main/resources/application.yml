@@ -4,8 +4,9 @@ server:
 spring:
   application:
     name: parameters-service
+
+
+gateway:
   security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://dev-kkp1gdup1nvbr6qj.us.auth0.com/  # tu tenant Auth0
+    header: X-Gateway-Request
+    secret: AdminUco2024
