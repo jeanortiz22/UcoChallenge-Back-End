@@ -9,6 +9,7 @@ import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.
 import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
 import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUserGateway;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserInputDomain;
 
 @Service
 public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
@@ -20,13 +21,14 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
     }
 
     @Override
-    public Void execute(final RegisterUserDomain domain) {
-        if (ObjectHelper.isNull(domain)) {
-        	throw UcoChallengeApplicationException.create(
-                    RegisterUserMessageCode.DOMAIN_DATA_REQUIRED,
-                    "Register user domain is required");
+    public Void execute(final RegisterUserInputDomain inputDomain) {
+        if (ObjectHelper.isNull(inputDomain)) {
+                throw UcoChallengeApplicationException.create(
+                    RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
+                    "Register user input domain is required");
         }
-
+        
+        final var domain = RegisterUserDomain.fromInput(inputDomain);
         registerUserGateway.save(domain);
         return Void.returnVoid();
     }

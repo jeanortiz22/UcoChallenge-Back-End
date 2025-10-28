@@ -15,6 +15,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Usuario")
 public class UserEntity {
+	
+	public static Builder builder() {
+	    return new Builder();
+	}
 
 	@Id
 	@Column(name = "id")
@@ -59,7 +63,7 @@ public class UserEntity {
 
 	private boolean mobileNumberConfirmedIsDefaultValue;
 
-	protected UserEntity() {
+	public UserEntity() {
 		setId(UUIDHelper.getDefault());
 		setIdType(new IdTypeEntity());
 		setIdNumber(TextHelper.getDefault());

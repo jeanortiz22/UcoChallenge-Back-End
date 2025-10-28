@@ -1,31 +1,30 @@
 package co.edu.uco.ucochallenge.application;
 
-public abstract class Response <T> {
-	
-	private boolean dataReturned;
-	private T data;
-	
-	protected Response(final boolean dataReturned,final T data) {
-		setDataReturned(dataReturned);
-		setData(data);
-	}
+import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
 
-	private void setDataReturned(boolean dataReturned) {
-		//Limpieza de datos
-		this.dataReturned = dataReturned;
-	}
+public abstract class Response<T> {
 
-	private void setData(T data) {
-		//Limpieza de datos - Con los helpers
-		this.data = data;
-	}
+    private boolean dataReturned;
+    private T data;
 
-	protected boolean isDataReturned() {
-		return dataReturned;
-	}
+    protected Response(final boolean dataReturned, final T data) {
+        setDataReturned(dataReturned);
+        setData(data);
+    }
 
-	protected T getData() {
-		return data;
-	}
+    private void setDataReturned(final boolean dataReturned) {
+        this.dataReturned = dataReturned;
+    }
 
+    private void setData(final T data) {
+        this.data = ObjectHelper.getDefault(data, null);
+    }
+
+    protected boolean isDataReturned() {
+        return dataReturned;
+    }
+
+    protected T getData() {
+        return data;
+    }
 }

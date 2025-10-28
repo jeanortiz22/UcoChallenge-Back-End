@@ -3,7 +3,8 @@ package co.edu.uco.ucochallenge.user.registeruser.application.messages;
 public final class RegisterUserMessageCode {
 
     public static final String INPUT_DATA_REQUIRED = "user.register.input.required";
-    public static final String DOMAIN_DATA_REQUIRED = "user.register.domain.required";
+    public static final String INPUT_DOMAIN_REQUIRED = "user.register.input.domain.required";
+    public static final String USER_IDENTIFIER_REQUIRED = "user.register.domain.identifier.required";
     public static final String ID_TYPE_REQUIRED = "user.register.idType.required";
     public static final String ID_NUMBER_REQUIRED = "user.register.idNumber.required";
     public static final String FIRST_NAME_REQUIRED = "user.register.firstName.required";
