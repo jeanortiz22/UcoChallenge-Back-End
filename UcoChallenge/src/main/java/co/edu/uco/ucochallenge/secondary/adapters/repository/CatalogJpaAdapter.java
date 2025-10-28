@@ -51,7 +51,7 @@ public class CatalogJpaAdapter implements CatalogGateway {
     @Override
     public List<StateDomain> listStates(final UUID countryId) {
         final var sanitizedCountryId = Objects.requireNonNull(countryId, "countryId is required");
-        return stateRepository.findByCountryId(sanitizedCountryId).stream()
+        return stateRepository.findByCountry_Id(sanitizedCountryId).stream()
                 .map(this::mapState)
                 .toList();
     }
@@ -59,7 +59,7 @@ public class CatalogJpaAdapter implements CatalogGateway {
     @Override
     public List<CityDomain> listCities(final UUID stateId) {
         final var sanitizedStateId = Objects.requireNonNull(stateId, "stateId is required");
-        return cityRepository.findByStateId(sanitizedStateId).stream()
+        return cityRepository.findByState_Id(sanitizedStateId).stream()
                 .map(this::mapCity)
                 .toList();
     }
