@@ -15,4 +15,6 @@ public interface RegisterUserGateway {
     boolean existsByEmail(String email);
 
     boolean existsByMobileNumber(String mobileNumber);
+    
+    boolean existsCity(UUID cityId);
 }

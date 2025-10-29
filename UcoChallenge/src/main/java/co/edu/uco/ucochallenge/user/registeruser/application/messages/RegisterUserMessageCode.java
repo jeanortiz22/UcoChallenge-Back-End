@@ -12,6 +12,7 @@ public final class RegisterUserMessageCode {
     public static final String FIRST_NAME_REQUIRED = "user.register.firstName.required";
     public static final String FIRST_SURNAME_REQUIRED = "user.register.firstSurname.required";
     public static final String HOME_CITY_REQUIRED = "user.register.homeCity.required";
+    public static final String HOME_CITY_NOT_FOUND = "user.register.homeCity.notFound";
     public static final String EMAIL_REQUIRED = "user.register.email.required";
     public static final String MOBILE_NUMBER_REQUIRED = "user.register.mobile.required";
     public static final String EMAIL_ALREADY_EXISTS = "user.register.email.duplicate";

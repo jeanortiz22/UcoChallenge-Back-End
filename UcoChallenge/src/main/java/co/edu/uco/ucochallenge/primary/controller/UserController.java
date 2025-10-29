@@ -46,19 +46,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<RegisterUserResponseDTO> registerUser(@RequestBody final RegisterUserInputDTO dto) {final var normalizedDto = RegisterUserInputDTO.normalize(
-            dto.idType(),
-            dto.idNumber(),
-            dto.firstName(),
-            dto.secondName(),
-            dto.firstSurname(),
-            dto.secondSurname(),
-            dto.homeCity(),
-            dto.email(),
-            dto.mobileNumber());
-
-    	final var response = registerUserInteractor.execute(normalizedDto);
+    public ResponseEntity<RegisterUserResponseDTO> registerUser(@RequestBody final RegisterUserInputDTO dto) {
+        final var normalizedDto = RegisterUserInputDTO.normalize(dto);
+        final var response = registerUserInteractor.execute(normalizedDto);
     	
     	return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+    
 }

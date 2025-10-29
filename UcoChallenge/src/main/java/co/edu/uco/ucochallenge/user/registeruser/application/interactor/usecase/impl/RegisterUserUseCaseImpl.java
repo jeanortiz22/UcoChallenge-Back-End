@@ -16,7 +16,7 @@ import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specificati
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueEmailSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueIdentificationSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueMobileNumberSpecification;
-
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.ExistingHomeCitySpecification;
 
 @Service
 public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
@@ -28,6 +28,7 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
     public RegisterUserUseCaseImpl(final RegisterUserGateway registerUserGateway) {
         this.registerUserGateway = registerUserGateway;
         this.registerUserSpecification = Specification.<RegisterUserDomain>identity()
+        		.and(new ExistingHomeCitySpecification(registerUserGateway))
                 .and(new GenerateUniqueUserIdentifierSpecification(registerUserGateway))
                 .and(new UniqueIdentificationSpecification(registerUserGateway))
                 .and(new UniqueEmailSpecification(registerUserGateway))

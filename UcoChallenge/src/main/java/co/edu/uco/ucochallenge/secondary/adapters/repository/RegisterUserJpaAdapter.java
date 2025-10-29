@@ -12,12 +12,15 @@ public class RegisterUserJpaAdapter implements RegisterUserGateway {
 
     private final SpringDataUserRepository userRepository;
     private final RegisterUserEntityMapper entityMapper;
+    private final SpringDataCityRepository cityRepository;
 
     public RegisterUserJpaAdapter(
     		final SpringDataUserRepository userRepository,
-    		final RegisterUserEntityMapper entityMapper) {
+    		final RegisterUserEntityMapper entityMapper,
+    		final SpringDataCityRepository cityRepository) {
         this.userRepository = userRepository;
         this.entityMapper = entityMapper;
+        this.cityRepository = cityRepository;
     }
 
     @Override
@@ -44,6 +47,11 @@ public class RegisterUserJpaAdapter implements RegisterUserGateway {
     @Override
     public boolean existsByMobileNumber(final String mobileNumber) {
         return userRepository.existsByMobileNumber(mobileNumber);
+    }
+    
+    @Override
+    public boolean existsCity(final UUID cityId) {
+        return cityRepository.existsById(cityId);
     }
 
 }

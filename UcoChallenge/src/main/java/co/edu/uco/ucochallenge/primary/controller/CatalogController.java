@@ -47,4 +47,5 @@ public class CatalogController {
         final var response = catalogInteractor.listCities(stateId);
         return ResponseEntity.ok(response);
     }
+
 }

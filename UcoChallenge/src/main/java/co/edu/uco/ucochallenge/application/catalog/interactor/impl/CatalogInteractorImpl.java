@@ -52,4 +52,5 @@ public class CatalogInteractorImpl implements CatalogInteractor {
                 .map(domain -> new CityDTO(domain.getId(), domain.getName(), domain.getStateId()))
                 .toList();
     }
+    
 }
