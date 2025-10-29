@@ -1,6 +1,10 @@
 package co.edu.uco.ucochallenge.primary.controller.response;
 
+import java.time.Instant;
 import java.util.List;
+
+import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
+import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 
 public final class ResponseError {
 
@@ -17,11 +21,11 @@ public final class ResponseError {
             final List<Object> parameters,
             final ResponseErrorType type,
             final String timestamp) {
-        this.message = message;
-        this.messageCode = messageCode;
-        this.parameters = parameters;
-        this.type = type;
-        this.timestamp = timestamp;
+    	this.message = TextHelper.getDefaultWithTrim(message);
+        this.messageCode = TextHelper.getDefaultWithTrim(messageCode);
+        this.parameters = List.copyOf(ObjectHelper.getDefault(parameters, List.of()));
+        this.type = ObjectHelper.getDefault(type, ResponseErrorType.UNKNOWN);
+        this.timestamp = TextHelper.isEmpty(timestamp) ? Instant.now().toString() : TextHelper.getDefaultWithTrim(timestamp);
     }
 
     // 🧠 Si ya tienes factory methods, déjalos igual (no se rompen)
@@ -30,7 +34,7 @@ public final class ResponseError {
             final String messageCode,
             final List<Object> parameters,
             final ResponseErrorType type) {
-        return new ResponseError(message, messageCode, parameters, type, java.time.Instant.now().toString());
+    	return new ResponseError(message, messageCode, parameters, type, Instant.now().toString());
     }
 
     public static ResponseError fromException(
@@ -41,10 +45,9 @@ public final class ResponseError {
                 exception.getMessageCode(),
                 exception.getParameters(),
                 type,
-                java.time.Instant.now().toString());
+                Instant.now().toString());
     }
 
-    // ✅ Getters obligatorios para que se serialice en JSON
     public String getMessage() { return message; }
     public String getMessageCode() { return messageCode; }
     public List<Object> getParameters() { return parameters; }

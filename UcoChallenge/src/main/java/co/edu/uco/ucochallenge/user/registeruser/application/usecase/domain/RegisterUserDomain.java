@@ -45,7 +45,7 @@ public record RegisterUserDomain(
 	        }
 
         return new RegisterUserDomain(
-            UUID.randomUUID(),
+            inputDomain.getId(),
             inputDomain.idType(),
             inputDomain.idNumber(),
             inputDomain.firstName(),
@@ -56,18 +56,32 @@ public record RegisterUserDomain(
             inputDomain.email(),
             inputDomain.mobileNumber());
     
-    }
-
-    private static UUID validateIdentifier(
-		final UUID value,
-        final String messageCode,
-        final String message,
-        final String fieldName) {
-        final var sanitized = UUIDHelper.getDefault(value);
-        if (UUIDHelper.getDefault().equals(sanitized)) {
-        	throw UcoChallengeApplicationException.create(messageCode, message, fieldName);
-        }
-        return sanitized;
-    }
+	    }
+		    
+	    public RegisterUserDomain withId(final UUID newId) {
+	        return new RegisterUserDomain(
+	            newId,
+	            idType,
+	            idNumber,
+	            firstName,
+	            secondName,
+	            firstSurname,
+	            secondSurname,
+	            homeCity,
+	            email,
+	            mobileNumber);
+	    }    
+	
+	    private static UUID validateIdentifier(
+			final UUID value,
+	        final String messageCode,
+	        final String message,
+	        final String fieldName) {
+	        final var sanitized = UUIDHelper.getDefault(value);
+	        if (UUIDHelper.getDefault().equals(sanitized)) {
+	        	throw UcoChallengeApplicationException.create(messageCode, message, fieldName);
+	        }
+	        return sanitized;
+	    }
 
 }

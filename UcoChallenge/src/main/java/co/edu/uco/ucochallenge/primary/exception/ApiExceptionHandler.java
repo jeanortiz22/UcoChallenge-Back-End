@@ -2,15 +2,22 @@ package co.edu.uco.ucochallenge.primary.exception;
 
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeBusinessException;
+import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeException;
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeTechnicalException;
 import co.edu.uco.ucochallenge.crosscuting.messages.MessageCatalogPort;
+import co.edu.uco.ucochallenge.primary.controller.response.ResponseError;
+import co.edu.uco.ucochallenge.primary.controller.response.ResponseErrorType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -24,97 +31,57 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(UcoChallengeBusinessException.class)
-    public ResponseEntity<?> handleBusiness(UcoChallengeBusinessException ex, Locale locale) {
-        return build(extractCode(ex), extractParams(ex), HttpStatus.BAD_REQUEST, locale);
+    public ResponseEntity<ResponseError> handleBusiness(UcoChallengeBusinessException ex, Locale locale) {
+        return build(ex, ResponseErrorType.BUSINESS, HttpStatus.BAD_REQUEST, locale);
     }
 
     @ExceptionHandler(UcoChallengeTechnicalException.class)
-    public ResponseEntity<?> handleTechnical(UcoChallengeTechnicalException ex, Locale locale) {
-        return build(extractCode(ex), extractParams(ex), HttpStatus.INTERNAL_SERVER_ERROR, locale);
+    public ResponseEntity<ResponseError> handleTechnical(UcoChallengeTechnicalException ex, Locale locale) {
+        return build(ex, ResponseErrorType.TECHNICAL, HttpStatus.INTERNAL_SERVER_ERROR, locale);
     }
 
     @ExceptionHandler(UcoChallengeApplicationException.class)
-    public ResponseEntity<?> handleApplication(UcoChallengeApplicationException ex, Locale locale) {
-        return build(extractCode(ex), extractParams(ex), HttpStatus.INTERNAL_SERVER_ERROR, locale);
+    public ResponseEntity<ResponseError> handleApplication(UcoChallengeApplicationException ex, Locale locale) {
+        return build(ex, ResponseErrorType.APPLICATION, HttpStatus.INTERNAL_SERVER_ERROR, locale);
     }
-
+    
+ 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleOthers(Exception ex) {
+    public ResponseEntity<ResponseError> handleOthers(Exception ex, Locale locale) {
         log.error("Excepción no controlada: {}", ex.getMessage(), ex);
-        var body = Map.of(
-                "timestamp", Instant.now().toString(),
-                "code", "UNEXPECTED_ERROR",
-                "message", "Ha ocurrido un error inesperado."
+        var error = new ResponseError(
+                resolveMessage("UNEXPECTED_ERROR", locale, List.of()),
+                "UNEXPECTED_ERROR",
+                List.of(),
+                ResponseErrorType.UNKNOWN,
+                Instant.now().toString()
         );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    // ---------- helpers ----------
-
-    private String extractCode(Object ex) {
-        try {
-            // Ajusta al nombre real de tu getter si es distinto:
-            return (String) ex.getClass().getMethod("getMessageCode").invoke(ex);
-        } catch (Exception ignore) {
-            try {
-                return (String) ex.getClass().getMethod("getCode").invoke(ex);
-            } catch (Exception e2) {
-                log.warn("No se pudo extraer el code de la excepción, usando 'UNKNOWN_CODE'");
-                return "UNKNOWN_CODE";
-            }
-        }
-    }
-
-    private Object[] extractParams(Object ex) {
-        // Muchas jerarquías exponen List<Object> o Object[] o incluso null.
-        try {
-            var m = ex.getClass().getMethod("getParameters");
-            var params = m.invoke(ex);
-            if (params == null) return new Object[0];
-
-            if (params instanceof List<?> list) {
-                log.debug("Parámetros desde excepción (List): size={}", list.size());
-                return list.toArray();
-            }
-            if (params.getClass().isArray()) {
-                var arr = (Object[]) params;
-                log.debug("Parámetros desde excepción (Array): size={}", arr.length);
-                return arr;
-            }
-            // Cualquier otra cosa: lo mando como único argumento
-            log.debug("Parámetros desde excepción (single): {}", params);
-            return new Object[]{ params };
-        } catch (NoSuchMethodException nsme) {
-            log.debug("La excepción no expone getParameters(); usando vacío");
-            return new Object[0];
-        } catch (Exception e) {
-            log.warn("Error obteniendo parámetros de la excepción: {}", e.getMessage());
-            return new Object[0];
-        }
-    }
-
-    private ResponseEntity<?> build(String code, Object[] params, HttpStatus status, Locale locale) {
-        String message;
-        try {
-            log.debug("Formateando con catálogo. code={}, args={}", code, Arrays.toString(params));
-            message = catalog.format(code, params);
-            if (message == null || message.isBlank()) {
-                message = "[" + code + "]";
-            }
-        } catch (IllegalArgumentException iae) {
-            // mismatch placeholders ↔ args
-            log.error("Mismatch al formatear: code={}, args={}, error={}", code, Arrays.toString(params), iae.getMessage());
-            message = "[" + code + "]";
-        } catch (Exception any) {
-            log.error("Catálogo falló para code={}: {}", code, any.getMessage());
-            message = "[" + code + "]";
-        }
-
-        var body = Map.of(
-                "timestamp", Instant.now().toString(),
-                "code", code,
-                "message", message
+    
+    private ResponseEntity<ResponseError> build(UcoChallengeException ex, ResponseErrorType type, HttpStatus status, Locale locale) {
+        var error = new ResponseError(
+                resolveMessage(ex.getMessageCode(), locale, ex.getParameters()),
+                ex.getMessageCode(),
+                ex.getParameters(),
+                type,
+                Instant.now().toString()
         );
-        return ResponseEntity.status(status).body(body);
+        return ResponseEntity.status(status).body(error);
+    }
+    
+    private String resolveMessage(String code, Locale locale, List<Object> parameters) {
+    	var args = parameters.toArray();
+        try {
+        	var formatted = catalog.format(code, locale, args);
+            if (formatted == null || formatted.isBlank()) {
+                return '[' + code + ']';
+            }
+         return formatted;
+    } catch (Exception error) {
+        log.error("Error formateando mensaje del catálogo. code={}, args={}, detalle={}", code, parameters, error.getMessage());
+        return '[' + code + ']';
+        }
     }
 }

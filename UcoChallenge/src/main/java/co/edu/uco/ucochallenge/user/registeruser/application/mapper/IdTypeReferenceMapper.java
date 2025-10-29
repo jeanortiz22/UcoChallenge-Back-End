@@ -10,7 +10,7 @@ import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.IdTypeEntity
 @Mapper(componentModel = "spring")
 public interface IdTypeReferenceMapper {
 
-    IdTypeEntity toEntity(UUID id); // MapStruct genera la implementación
+    IdTypeEntity toEntity(UUID id); 
 
     @ObjectFactory
     default IdTypeEntity newIdType(UUID id) {
