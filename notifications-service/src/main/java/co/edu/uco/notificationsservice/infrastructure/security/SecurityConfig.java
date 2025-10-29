@@ -4,6 +4,7 @@ import co.edu.uco.ucochallenge.infrastructure.security.GatewayOnlyFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -12,21 +13,20 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(
-            org.springframework.security.config.annotation.web.builders.HttpSecurity http,
+            HttpSecurity http,
             @Value("${gateway.security.header}") String headerName,
             @Value("${gateway.security.secret}") String secret
     ) throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/notifications/api/v1/templates/**").permitAll()
+                        .requestMatchers("/actuator/**", "/notifications/api/v1/health").permitAll()
+                        .requestMatchers("/notifications/api/v1/templates/**").permitAll() // público si quieres probar; si no, quita este permitAll
                         .anyRequest().permitAll()
                 );
 
+        // cerrar por header compartido (modo B)
         http.addFilterBefore(new GatewayOnlyFilter(headerName, secret), BasicAuthenticationFilter.class);
-
         return http.build();
     }
 }

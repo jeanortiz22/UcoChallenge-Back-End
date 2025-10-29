@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/UcoChallenge/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/UcoChallengeGateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/messages-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notifications-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/parameters-service/src/main/java" charset="UTF-8" />
   </component>
 </project>

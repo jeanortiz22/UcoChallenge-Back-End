@@ -9,6 +9,7 @@
         <module name="messages-service" />
         <module name="UcoChallengeGateway" />
         <module name="parameters-service" />
+        <module name="notifications-service" />
       </profile>
       <profile name="Annotation profile for UcoChallenge" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -17,6 +18,8 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
         <module name="uco-challenge" />
       </profile>
@@ -26,8 +29,9 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="UcoChallengeGateway" options="-parameters" />
       <module name="messages-service" options="-parameters" />
+      <module name="notifications-service" options="-parameters" />
       <module name="parameters-service" options="-parameters" />
-      <module name="uco-challenge" options="-parameters" />
+      <module name="uco-challenge" options="-parameters -parameters" />
     </option>
   </component>
 </project>

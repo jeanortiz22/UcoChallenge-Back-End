@@ -94,4 +94,28 @@ public class WebClientConfig {
                 })
                 .build();
     }
+
+    @Bean(name = "notificationsWebClient")
+    public WebClient notificationsWebClient(
+            WebClient.Builder builder,
+            @Value("${notifications.api.base-url}") String baseUrl,
+            @Value("${gateway.security.header}") String headerName,
+            @Value("${gateway.security.secret}") String secret
+    ) {
+        log.info("### NotificationsAPI baseUrl = {}", baseUrl);
+        return builder
+                .baseUrl(baseUrl)
+                .defaultHeader(headerName, secret)
+                .exchangeStrategies(ExchangeStrategies.builder()
+                        .codecs(c -> c.defaultCodecs().maxInMemorySize(512 * 1024))
+                        .build())
+                .clientConnector(new ReactorClientHttpConnector(buildHttpClient()))
+                .filter((req, next) -> {
+                    log.debug(">>> OUT to {} sending {}={}", req.url(), headerName, req.headers().getFirst(headerName));
+                    return next.exchange(req);
+                })
+                .build();
+    }
+
+
 }
