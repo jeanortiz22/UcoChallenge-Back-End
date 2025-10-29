@@ -1,0 +1,13 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: notifications-service
+
+# Este servicio también se protege mediante el encabezado del gateway
+# pero deja los endpoints abiertos para facilitar pruebas locales.
+gateway:
+  security:
+    header: X-Gateway-Request
+    secret: AdminUco2024

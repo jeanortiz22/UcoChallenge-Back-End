@@ -1,10 +1,9 @@
 package co.edu.uco.ucochallenge.user.listusers.application.port.out;
 
-import java.util.List;
-
-import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.UserSummaryDomain;
+import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.ListUsersQueryDomain;
+import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.UserSummaryPageDomain;
 
 public interface ListUsersGateway {
 
-    List<UserSummaryDomain> findAll();
+    UserSummaryPageDomain findAll(ListUsersQueryDomain query);
 }

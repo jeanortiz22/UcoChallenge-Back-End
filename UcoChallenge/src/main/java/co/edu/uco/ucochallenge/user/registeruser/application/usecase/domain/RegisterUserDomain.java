@@ -45,7 +45,7 @@ public record RegisterUserDomain(
 	        }
 
         return new RegisterUserDomain(
-            UUID.randomUUID(),
+            inputDomain.getId(),
             inputDomain.idType(),
             inputDomain.idNumber(),
             inputDomain.firstName(),
@@ -56,6 +56,20 @@ public record RegisterUserDomain(
             inputDomain.email(),
             inputDomain.mobileNumber());
     
+    }
+
+    public RegisterUserDomain withId(final UUID newId) {
+        return new RegisterUserDomain(
+            newId,
+            idType,
+            idNumber,
+            firstName,
+            secondName,
+            firstSurname,
+            secondSurname,
+            homeCity,
+            email,
+            mobileNumber);
     }
 
     private static UUID validateIdentifier(
