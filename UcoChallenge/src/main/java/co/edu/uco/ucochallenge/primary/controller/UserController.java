@@ -19,6 +19,7 @@ import co.edu.uco.ucochallenge.user.listusers.application.interactor.dto.UserRes
 
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.RegisterUserInteractor;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.RegisterUserInputDTO;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.RegisterUserResponseDTO;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -45,8 +46,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<String> registerUser(@RequestBody final RegisterUserInputDTO dto) {
-        final var normalizedDto = RegisterUserInputDTO.normalize(
+    public ResponseEntity<RegisterUserResponseDTO> registerUser(@RequestBody final RegisterUserInputDTO dto) {final var normalizedDto = RegisterUserInputDTO.normalize(
             dto.idType(),
             dto.idNumber(),
             dto.firstName(),
@@ -57,8 +57,8 @@ public class UserController {
             dto.email(),
             dto.mobileNumber());
 
-        registerUserInteractor.execute(normalizedDto);
-
-        return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
+    	final var response = registerUserInteractor.execute(normalizedDto);
+    	
+    	return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -14,10 +14,11 @@ import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.Regi
 )
 public interface RegisterUserEntityMapper {
 
-    @Mapping(source = "idType",   target = "idType")     // UUID -> IdTypeEntity
-    @Mapping(source = "homeCity", target = "homeCity")   // UUID -> CityEntity
+    @Mapping(source = "idType",   target = "idType")   
+    @Mapping(source = "homeCity", target = "homeCity")
     @Mapping(target = "emailConfirmed", ignore = true)
     @Mapping(target = "mobileNumberConfirmed", ignore = true)
+    
 
     UserEntity toEntity(RegisterUserDomain domain);
 }

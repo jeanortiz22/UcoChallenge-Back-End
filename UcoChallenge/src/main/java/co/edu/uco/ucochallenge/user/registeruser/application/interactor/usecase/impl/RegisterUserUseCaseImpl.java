@@ -11,6 +11,7 @@ import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUs
 import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUserGateway;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserInputDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserResultDomain;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.GenerateUniqueUserIdentifierSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueEmailSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueIdentificationSpecification;
@@ -34,7 +35,7 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
     }
 
     @Override
-    public Void execute(final RegisterUserInputDomain inputDomain) {
+    public RegisterUserResultDomain execute(final RegisterUserInputDomain inputDomain) {
         if (ObjectHelper.isNull(inputDomain)) {
                 throw UcoChallengeApplicationException.create(
                     RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
@@ -44,6 +45,6 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
         final var domain = RegisterUserDomain.fromInput(inputDomain);
         final var validatedDomain = registerUserSpecification.apply(domain);
         registerUserGateway.save(validatedDomain);
-        return Void.returnVoid();
+        return RegisterUserResultDomain.success(validatedDomain.id());
     }
 }

@@ -16,6 +16,7 @@ public final class RegisterUserMessageCode {
     public static final String MOBILE_NUMBER_REQUIRED = "user.register.mobile.required";
     public static final String EMAIL_ALREADY_EXISTS = "user.register.email.duplicate";
     public static final String MOBILE_NUMBER_ALREADY_EXISTS = "user.register.mobile.duplicate";
+    public static final String USER_REGISTERED_SUCCESSFULLY = "USUARIO_CREADO_OK";
 
     private RegisterUserMessageCode() {
     	
