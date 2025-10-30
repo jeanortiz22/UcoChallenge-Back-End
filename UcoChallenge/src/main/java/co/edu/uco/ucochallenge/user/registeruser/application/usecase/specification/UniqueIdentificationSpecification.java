@@ -6,13 +6,20 @@ import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.specifi
 import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
 import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUserGateway;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.DuplicateRegistrationNotifier;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.event.DuplicateRegistrationEvent;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.event.DuplicateType;
 
 public final class UniqueIdentificationSpecification implements Specification<RegisterUserDomain> {
 
     private final RegisterUserGateway registerUserGateway;
+    private final DuplicateRegistrationNotifier duplicateRegistrationNotifier;
 
-    public UniqueIdentificationSpecification(final RegisterUserGateway registerUserGateway) {
+    public UniqueIdentificationSpecification(
+            final RegisterUserGateway registerUserGateway,
+            final DuplicateRegistrationNotifier duplicateRegistrationNotifier) {
         this.registerUserGateway = registerUserGateway;
+        this.duplicateRegistrationNotifier = duplicateRegistrationNotifier;
     }
 
     @Override
@@ -24,6 +31,13 @@ public final class UniqueIdentificationSpecification implements Specification<Re
         }
 
         if (registerUserGateway.existsByIdentification(candidate.idType(), candidate.idNumber())) {
+        	final var existing = registerUserGateway
+                    .findByIdentification(candidate.idType(), candidate.idNumber())
+                    .orElse(null);
+            duplicateRegistrationNotifier.notify(new DuplicateRegistrationEvent(
+                    DuplicateType.IDENTIFICATION,
+                    candidate,
+                    existing));
             throw UcoChallengeBusinessException.create(
                 RegisterUserMessageCode.IDENTIFICATION_ALREADY_EXISTS,
                 "A user with the same identification type and number already exists",

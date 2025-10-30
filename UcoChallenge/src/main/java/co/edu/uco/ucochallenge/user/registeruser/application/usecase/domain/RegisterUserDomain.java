@@ -1,5 +1,6 @@
 package co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
@@ -18,9 +19,13 @@ public record RegisterUserDomain(
 	    String secondSurname,
 	    UUID homeCity,
 	    String email,
-	    String mobileNumber) {
+        String mobileNumber,
+        String emailConfirmationToken,
+        LocalDateTime emailConfirmationExpiresAt,
+        String mobileConfirmationToken,
+        LocalDateTime mobileConfirmationExpiresAt) {
 
-	    public RegisterUserDomain {
+		public RegisterUserDomain {
 	        id = validateIdentifier(
 	            id,
 	            RegisterUserMessageCode.USER_IDENTIFIER_REQUIRED,
@@ -35,7 +40,11 @@ public record RegisterUserDomain(
 	        homeCity = UUIDHelper.getDefault(homeCity);
 	        email = TextHelper.getDefaultWithTrim(email);
 	        mobileNumber = TextHelper.getDefaultWithTrim(mobileNumber);
-	    } 
+	        emailConfirmationToken = TextHelper.getDefaultWithTrim(emailConfirmationToken);
+	        emailConfirmationExpiresAt = ObjectHelper.getDefault(emailConfirmationExpiresAt, LocalDateTime.MIN);
+	        mobileConfirmationToken = TextHelper.getDefaultWithTrim(mobileConfirmationToken);
+	        mobileConfirmationExpiresAt = ObjectHelper.getDefault(mobileConfirmationExpiresAt, LocalDateTime.MIN);
+	    }
 
 	    public static RegisterUserDomain fromInput(final RegisterUserInputDomain inputDomain) {
 	        if (ObjectHelper.isNull(inputDomain)) {
@@ -54,24 +63,57 @@ public record RegisterUserDomain(
             inputDomain.secondSurname(),
             inputDomain.homeCity(),
             inputDomain.email(),
-            inputDomain.mobileNumber());
-    
-	    }
-		    
-	    public RegisterUserDomain withId(final UUID newId) {
-	        return new RegisterUserDomain(
-	            newId,
-	            idType,
-	            idNumber,
-	            firstName,
-	            secondName,
-	            firstSurname,
-	            secondSurname,
-	            homeCity,
-	            email,
-	            mobileNumber);
-	    }    
-	
+            inputDomain.mobileNumber(),
+            TextHelper.getDefault(),
+            LocalDateTime.MIN,
+            TextHelper.getDefault(),
+            LocalDateTime.MIN);
+
+            }
+
+            public RegisterUserDomain withId(final UUID newId) {
+                return new RegisterUserDomain(
+                    newId,
+                    idType,
+                    idNumber,
+                    firstName,
+                    secondName,
+                    firstSurname,
+                    secondSurname,
+                    homeCity,
+                    email,
+                    mobileNumber,
+                    emailConfirmationToken,
+                    emailConfirmationExpiresAt,
+                    mobileConfirmationToken,
+                    mobileConfirmationExpiresAt);
+            }
+
+            public RegisterUserDomain withConfirmationTokens(final ConfirmationTokens tokens) {
+                if (ObjectHelper.isNull(tokens)) {
+                    throw UcoChallengeApplicationException.create(
+                        RegisterUserMessageCode.CONFIRMATION_TOKEN_GENERATION_FAILED,
+                        "Confirmation tokens are required");
+                }
+
+                return new RegisterUserDomain(
+                    id,
+                    idType,
+                    idNumber,
+                    firstName,
+                    secondName,
+                    firstSurname,
+                    secondSurname,
+                    homeCity,
+                    email,
+                    mobileNumber,
+                    tokens.emailToken(),
+                    tokens.emailExpiresAt(),
+                    tokens.smsToken(),
+                    tokens.smsExpiresAt());
+            }
+            
+            
 	    private static UUID validateIdentifier(
 			final UUID value,
 	        final String messageCode,

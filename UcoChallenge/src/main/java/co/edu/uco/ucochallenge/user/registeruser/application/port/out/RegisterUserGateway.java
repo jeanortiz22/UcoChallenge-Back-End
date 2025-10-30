@@ -1,7 +1,9 @@
 package co.edu.uco.ucochallenge.user.registeruser.application.port.out;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.ExistingUserInformation;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
 
 public interface RegisterUserGateway {
@@ -11,10 +13,16 @@ public interface RegisterUserGateway {
     boolean existsById(UUID id);
 
     boolean existsByIdentification(UUID idType, String idNumber);
+    
+    Optional<ExistingUserInformation> findByIdentification(UUID idType, String idNumber);
 
     boolean existsByEmail(String email);
+    
+    Optional<ExistingUserInformation> findByEmail(String email);
 
     boolean existsByMobileNumber(String mobileNumber);
+    
+    Optional<ExistingUserInformation> findByMobileNumber(String mobileNumber);
     
     boolean existsCity(UUID cityId);
 }

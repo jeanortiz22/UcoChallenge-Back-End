@@ -11,11 +11,14 @@ import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUs
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserInputDomain;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserResultDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.ConfirmationTokenService;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.DuplicateRegistrationNotifier;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.GenerateUniqueUserIdentifierSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueEmailSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueIdentificationSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueMobileNumberSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.ExistingHomeCitySpecification;
+import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.GenerateConfirmationTokensSpecification;
 
 @Service
 public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
@@ -24,22 +27,27 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
     private final Specification<RegisterUserDomain> registerUserSpecification;
 
 
-    public RegisterUserUseCaseImpl(final RegisterUserGateway registerUserGateway) {
+    public RegisterUserUseCaseImpl(
+            final RegisterUserGateway registerUserGateway,
+            final ConfirmationTokenService confirmationTokenService,
+            final DuplicateRegistrationNotifier duplicateRegistrationNotifier) {
         this.registerUserGateway = registerUserGateway;
         this.registerUserSpecification = Specification.<RegisterUserDomain>identity()
         		.and(new ExistingHomeCitySpecification(registerUserGateway))
                 .and(new GenerateUniqueUserIdentifierSpecification(registerUserGateway))
-                .and(new UniqueIdentificationSpecification(registerUserGateway))
-                .and(new UniqueEmailSpecification(registerUserGateway))
-                .and(new UniqueMobileNumberSpecification(registerUserGateway));
-    }
+                .and(new UniqueIdentificationSpecification(registerUserGateway, duplicateRegistrationNotifier))
+                .and(new UniqueEmailSpecification(registerUserGateway, duplicateRegistrationNotifier))
+                .and(new UniqueMobileNumberSpecification(registerUserGateway, duplicateRegistrationNotifier))
+                .and(new GenerateConfirmationTokensSpecification(confirmationTokenService));
 
-    @Override
-    public RegisterUserResultDomain execute(final RegisterUserInputDomain inputDomain) {
-        if (ObjectHelper.isNull(inputDomain)) {
-                throw UcoChallengeApplicationException.create(
-                    RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
-                    "Register user input domain is required");
+    	}
+        
+	    @Override
+	    public RegisterUserResultDomain execute(final RegisterUserInputDomain inputDomain) {
+	        if (ObjectHelper.isNull(inputDomain)) {
+	                throw UcoChallengeApplicationException.create(
+	                    RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
+	                    "Register user input domain is required");
         }
         
         final var domain = RegisterUserDomain.fromInput(inputDomain);
