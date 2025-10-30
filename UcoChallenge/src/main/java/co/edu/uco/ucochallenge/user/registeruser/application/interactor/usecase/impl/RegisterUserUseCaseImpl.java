@@ -2,10 +2,9 @@ package co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase
 
 import org.springframework.stereotype.Service;
 
-import co.edu.uco.ucochallenge.application.Void;
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
 import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
-import co.edu.uco.ucochallenge.crosscuting.specification.Specification;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.specification.Specification;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.RegisterUserUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
 import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUserGateway;

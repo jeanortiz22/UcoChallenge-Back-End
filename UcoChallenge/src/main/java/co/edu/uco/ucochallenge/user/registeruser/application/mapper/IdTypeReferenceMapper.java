@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;
 
-import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.IdTypeEntity;
+import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.IdTypeEntity;
 
 @Mapper(componentModel = "spring")
 public interface IdTypeReferenceMapper {

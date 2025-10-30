@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Builder;
 
-import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;
+import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.UserEntity;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
 
 @Mapper(
