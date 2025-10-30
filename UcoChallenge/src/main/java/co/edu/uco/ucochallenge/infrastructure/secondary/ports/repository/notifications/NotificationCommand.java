@@ -6,7 +6,9 @@ public record NotificationCommand(
         String templateKey,
         String email,
         String subject,
-        String htmlBody
+        String htmlBody,
+        String mobileNumber,
+        String smsMessage
 ) {
 
     public NotificationCommand {
@@ -14,6 +16,8 @@ public record NotificationCommand(
         email = TextHelper.getDefaultWithTrim(email);
         subject = TextHelper.getDefault(subject);
         htmlBody = TextHelper.getDefault(htmlBody);
+        mobileNumber = TextHelper.getDefaultWithTrim(mobileNumber);
+        smsMessage = TextHelper.getDefaultWithTrim(smsMessage);
     }
 
     public boolean hasTemplate() {
@@ -30,5 +34,13 @@ public record NotificationCommand(
 
     public boolean hasHtmlBody() {
         return !TextHelper.isEmpty(htmlBody);
+    }
+    
+    public boolean hasMobileNumber() {
+        return !TextHelper.isEmpty(mobileNumber);
+    }
+
+    public boolean hasSmsMessage() {
+        return !TextHelper.isEmpty(smsMessage);
     }
 }

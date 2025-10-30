@@ -48,12 +48,16 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
         final var subject = "Intento de registro duplicado";
         final var body = buildBody(event);
 
-        recipients.forEach(email -> notificationCatalog.send(
-                new NotificationCommand(
-                        templateKeyFor(event.type()),
-                        email,
-                        subject,
-                        body)));
+        recipients.forEach(recipient -> {
+            final var smsMessage = buildSmsMessage(event, recipient);
+            notificationCatalog.send(new NotificationCommand(
+                    templateKeyFor(event.type()),
+                    recipient.email(),
+                    subject,
+                    body,
+                    recipient.mobileNumber(),
+                    smsMessage));
+        });
     }
 
     private void logDuplicate(final DuplicateRegistrationEvent event) {
@@ -63,23 +67,32 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
                 existing != null ? existing.email() : "N/A");
     }
 
-    private Set<String> buildRecipients(final DuplicateRegistrationEvent event) {
-        final Set<String> recipients = new LinkedHashSet<>();
+    private Set<Recipient> buildRecipients(final DuplicateRegistrationEvent event) {
+        final Set<Recipient> recipients = new LinkedHashSet<>();
         final var adminEmail = parameterCatalog.get(ADMIN_EMAIL_PARAMETER, Locale.getDefault());
-        addRecipient(recipients, adminEmail);
-        addRecipient(recipients, event.candidate().email());
+        addRecipient(recipients, adminEmail, TextHelper.getDefault(), RecipientType.ADMIN);
+        addRecipient(recipients,
+                event.candidate().email(),
+                event.candidate().mobileNumber(),
+                RecipientType.CANDIDATE);
         final ExistingUserInformation existing = event.existingUser();
         if (existing != null) {
-            addRecipient(recipients, existing.email());
+        	addRecipient(recipients,
+                    existing.email(),
+                    existing.mobileNumber(),
+                    RecipientType.EXISTING_USER);
         }
         return recipients;
     }
 
-    private void addRecipient(final Set<String> recipients, final String email) {
-        final var sanitized = TextHelper.getDefaultWithTrim(email);
-        if (!TextHelper.isEmpty(sanitized) && sanitized.contains("@")) {
-            recipients.add(sanitized);
+    private void addRecipient(final Set<Recipient> recipients, final String email, final String mobile,
+            final RecipientType type) {
+        final var sanitizedEmail = TextHelper.getDefaultWithTrim(email);
+        final var sanitizedMobile = TextHelper.getDefaultWithTrim(mobile);
+        if (TextHelper.isEmpty(sanitizedEmail) && TextHelper.isEmpty(sanitizedMobile)) {
+            return;
         }
+        recipients.add(new Recipient(sanitizedEmail, sanitizedMobile, type));
     }
 
     private String buildBody(final DuplicateRegistrationEvent event) {
@@ -92,6 +105,20 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
                 "\nSolicitante: " + candidate.email() +
                 "\nTitular registrado: " + existingName + " - " + existingEmail;
     }
+    
+    private String buildSmsMessage(final DuplicateRegistrationEvent event, final Recipient recipient) {
+        if (event.type() != DuplicateType.MOBILE_NUMBER) {
+            return TextHelper.getDefault();
+        }
+
+        if (recipient.type() == RecipientType.CANDIDATE) {
+            return "Tu número móvil ya está asociado a una cuenta existente. Revisa tu correo o contacta al administrador si necesitas ayuda.";
+        }
+        if (recipient.type() == RecipientType.EXISTING_USER) {
+            return "Detectamos un intento de registro con tu número móvil. Si no fuiste tú, comunícate con soporte.";
+        }
+        return TextHelper.getDefault();
+    }
 
     private String templateKeyFor(final DuplicateType type) {
         return switch (type) {
@@ -99,5 +126,14 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
             case EMAIL -> "user.register.duplicate.email";
             case MOBILE_NUMBER -> "user.register.duplicate.mobile";
         };
+    }
+    
+    private record Recipient(String email, String mobileNumber, RecipientType type) {
+    }
+
+    private enum RecipientType {
+        ADMIN,
+        CANDIDATE,
+        EXISTING_USER
     }
 }

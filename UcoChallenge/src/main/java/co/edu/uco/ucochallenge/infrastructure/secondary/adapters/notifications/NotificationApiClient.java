@@ -6,6 +6,7 @@ import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.notific
 import com.notificationapi.NotificationApi;
 import com.notificationapi.model.EmailOptions;
 import com.notificationapi.model.NotificationRequest;
+import com.notificationapi.model.SmsOptions;
 import com.notificationapi.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,18 +38,26 @@ public class NotificationApiClient implements NotificationCatalogPort {
             );
         }
 
-        if (!command.hasEmail()) {
+        if (!command.hasEmail() && !command.hasMobileNumber()) {
             throw UcoChallengeTechnicalException.create(
                     "NOTIFICACION_DESTINATARIO_REQUERIDO",
-                    "Debe proporcionarse al menos un email de destinatario para la notificación"
+                    "Debe proporcionarse al menos un medio de contacto (email o número móvil) para la notificación"
             );
         }
 
         try {
-            User user = new User(command.email()).setEmail(command.email());
+        	String identifier = command.hasEmail() ? command.email() : command.mobileNumber();
+            User user = new User(identifier);
+            if (command.hasEmail()) {
+                user.setEmail(command.email());
+            }
+            if (command.hasMobileNumber()) {
+                user.setNumber(command.mobileNumber());
+            }
+            
             NotificationRequest request = new NotificationRequest(command.templateKey(), user);
 
-            if (command.hasSubject() || command.hasHtmlBody()) {
+            if (command.hasEmail() && (command.hasSubject() || command.hasHtmlBody())) {
                 EmailOptions emailOptions = new EmailOptions();
                 if (command.hasSubject()) {
                     emailOptions.setSubject(command.subject());
@@ -58,14 +67,21 @@ public class NotificationApiClient implements NotificationCatalogPort {
                 }
                 request.setEmail(emailOptions);
             }
+            
+            if (command.hasSmsMessage() && command.hasMobileNumber()) {
+                SmsOptions smsOptions = new SmsOptions();
+                smsOptions.setMessage(command.smsMessage());
+                request.setSms(smsOptions);
+            }
+
 
             String response = notificationApi.send(request);
-            log.debug("Notificación enviada. template={}, email={}, respuesta={}",
-                    command.templateKey(), command.email(), response);
+            log.debug("Notificación enviada. template={}, email={}, mobile={}, respuesta={}",
+                    command.templateKey(), command.email(), command.mobileNumber(), response);
             return response;
         } catch (Exception ex) {
-            log.error("Error enviando notificación template={} email={}: {}",
-                    command.templateKey(), command.email(), ex.getMessage(), ex);
+        	log.error("Error enviando notificación template={} email={} mobile={}: {}",
+                    command.templateKey(), command.email(), command.mobileNumber(), ex.getMessage(), ex);
             throw UcoChallengeTechnicalException.create(
                     "ERROR_ENVIANDO_NOTIFICACION",
                     "Error enviando la notificación a NotificationAPI",
