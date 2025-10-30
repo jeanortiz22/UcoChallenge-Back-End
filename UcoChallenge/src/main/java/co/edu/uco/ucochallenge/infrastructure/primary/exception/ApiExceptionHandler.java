@@ -42,7 +42,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(UcoChallengeApplicationException.class)
     public ResponseEntity<ResponseError> handleApplication(UcoChallengeApplicationException ex, Locale locale) {
-        return build(ex, ResponseErrorType.APPLICATION, HttpStatus.INTERNAL_SERVER_ERROR, locale);
+    	return build(ex, ResponseErrorType.APPLICATION, HttpStatus.BAD_REQUEST, locale);
     }
     
  

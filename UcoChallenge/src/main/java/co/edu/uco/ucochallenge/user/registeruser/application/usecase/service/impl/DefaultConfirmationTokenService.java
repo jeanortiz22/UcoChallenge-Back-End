@@ -17,7 +17,6 @@ import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.parameters.ParameterCatalogPort;
 import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.ConfirmationTokens;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.ConfirmationTokenService;
 
 @Service
@@ -29,10 +28,11 @@ public class DefaultConfirmationTokenService implements ConfirmationTokenService
     static final String SMS_TOKEN_TTL_CODE = "USER.REGISTER.SMS_TOKEN_TTL_MIN";
     private static final int DEFAULT_EMAIL_TOKEN_TTL = 1_440;
     private static final int DEFAULT_SMS_TOKEN_TTL = 10;
-    private static final int EMAIL_TOKEN_LENGTH = 32;
+    private static final int EMAIL_TOKEN_LENGTH = 6;
     private static final int SMS_TOKEN_LENGTH = 6;
     private static final String EMAIL_TOKEN_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final String SMS_TOKEN_ALPHABET = "0123456789";
+    private static final String SMS_TOKEN_FIRST_DIGIT_ALPHABET = "123456789";
 
     private final ParameterCatalogPort parameterCatalog;
     private final Clock clock;
@@ -62,7 +62,7 @@ public class DefaultConfirmationTokenService implements ConfirmationTokenService
 
         final var now = LocalDateTime.now(clock);
         final var emailToken = generateToken(EMAIL_TOKEN_ALPHABET, EMAIL_TOKEN_LENGTH);
-        final var smsToken = generateToken(SMS_TOKEN_ALPHABET, SMS_TOKEN_LENGTH);
+        final var smsToken = generateSmsToken(SMS_TOKEN_LENGTH);
         final var emailExpiresAt = now.plusMinutes(readTtlMinutes(EMAIL_TOKEN_TTL_CODE, DEFAULT_EMAIL_TOKEN_TTL));
         final var smsExpiresAt = now.plusMinutes(readTtlMinutes(SMS_TOKEN_TTL_CODE, DEFAULT_SMS_TOKEN_TTL));
 
@@ -90,9 +90,29 @@ public class DefaultConfirmationTokenService implements ConfirmationTokenService
     private String generateToken(final String alphabet, final int length) {
         final var builder = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
-            final var index = secureRandom.nextInt(alphabet.length());
-            builder.append(alphabet.charAt(index));
+            builder.append(randomChar(alphabet));
         }
         return builder.toString();
     }
+    
+    private String generateSmsToken(final int length) {
+        if (length <= 0) {
+            return TextHelper.getDefault();
+        }
+
+        final var builder = new StringBuilder(length);
+        builder.append(randomChar(SMS_TOKEN_FIRST_DIGIT_ALPHABET));
+
+        for (int i = 1; i < length; i++) {
+            builder.append(randomChar(SMS_TOKEN_ALPHABET));
+        }
+
+        return builder.toString();
+    }
+
+    private char randomChar(final String alphabet) {
+        final var index = secureRandom.nextInt(alphabet.length());
+        return alphabet.charAt(index);
+    }
+   
 }
