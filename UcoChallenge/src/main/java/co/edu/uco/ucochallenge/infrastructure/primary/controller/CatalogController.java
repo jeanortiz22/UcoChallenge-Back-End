@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +46,12 @@ public class CatalogController {
     @GetMapping("/ciudades")
     public ResponseEntity<List<CityDTO>> listCities(@RequestParam("departamentoId") final UUID stateId) {
         final var response = catalogInteractor.listCities(stateId);
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/ciudades/{ciudadId}")
+    public ResponseEntity<CityDTO> getCity(@PathVariable("ciudadId") final UUID cityId) {
+        final var response = catalogInteractor.getCity(cityId);
         return ResponseEntity.ok(response);
     }
 }

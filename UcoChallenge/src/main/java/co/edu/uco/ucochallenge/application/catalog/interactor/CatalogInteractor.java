@@ -17,4 +17,6 @@ public interface CatalogInteractor {
 
     List<CityDTO> listCities(UUID stateId);
     
+    CityDTO getCity(UUID cityId);
+    
 }

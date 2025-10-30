@@ -16,6 +16,7 @@ import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.Exis
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.DuplicateRegistrationNotifier;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.event.DuplicateRegistrationEvent;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.event.DuplicateType;
+import co.edu.uco.ucochallenge.user.shared.MobileNumberFormatter;
 
 @Component
 public class NotificationDuplicateRegistrationNotifier implements DuplicateRegistrationNotifier {
@@ -25,12 +26,15 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
 
     private final NotificationCatalogPort notificationCatalog;
     private final ParameterCatalogPort parameterCatalog;
+    private final MobileNumberFormatter mobileNumberFormatter;
 
     public NotificationDuplicateRegistrationNotifier(
             final NotificationCatalogPort notificationCatalog,
-            final ParameterCatalogPort parameterCatalog) {
+            final ParameterCatalogPort parameterCatalog,
+            final MobileNumberFormatter mobileNumberFormatter) {
         this.notificationCatalog = notificationCatalog;
         this.parameterCatalog = parameterCatalog;
+        this.mobileNumberFormatter = mobileNumberFormatter;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
                     recipient.email(),
                     subject,
                     body,
-                    recipient.mobileNumber(),
+                    mobileNumberFormatter.format(recipient.mobileNumber()),
                     smsMessage));
         });
     }
@@ -119,7 +123,8 @@ public class NotificationDuplicateRegistrationNotifier implements DuplicateRegis
         }
         return TextHelper.getDefault();
     }
-
+    
+    
     private String templateKeyFor(final DuplicateType type) {
         return switch (type) {
             case IDENTIFICATION -> "user.register.duplicate.identification";

@@ -23,7 +23,7 @@ public final class GenerateConfirmationTokensSpecification implements Specificat
                     "Register user domain is required");
         }
 
-        final var tokens = confirmationTokenService.generateTokens(candidate);
+        final var tokens = confirmationTokenService.generateTokens(candidate.email(), candidate.mobileNumber());
         return candidate.withConfirmationTokens(tokens);
     }
 }

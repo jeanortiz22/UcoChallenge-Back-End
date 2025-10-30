@@ -53,11 +53,11 @@ public class DefaultConfirmationTokenService implements ConfirmationTokenService
     }
 
     @Override
-    public ConfirmationTokens generateTokens(final RegisterUserDomain domain) {
-        if (ObjectHelper.isNull(domain)) {
+    public ConfirmationTokens generateTokens(final String email, final String mobileNumber) {
+        if (TextHelper.isEmpty(email) && TextHelper.isEmpty(mobileNumber)) {
             throw UcoChallengeApplicationException.create(
                     RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
-                    "Register user domain is required");
+                    "Contact information is required to generate confirmation tokens");
         }
 
         final var now = LocalDateTime.now(clock);

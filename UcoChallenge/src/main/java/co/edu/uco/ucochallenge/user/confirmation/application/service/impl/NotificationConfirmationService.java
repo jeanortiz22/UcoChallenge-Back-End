@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.impl;
+package co.edu.uco.ucochallenge.user.confirmation.application.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,16 +13,17 @@ import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.messages.MessageCatalogPort;
 import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.notifications.NotificationCatalogPort;
 import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.notifications.NotificationCommand;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.ConfirmationNotificationService;
+import co.edu.uco.ucochallenge.user.confirmation.application.domain.UserConfirmationDomain;
+import co.edu.uco.ucochallenge.user.confirmation.application.service.ConfirmationNotificationService;
+import co.edu.uco.ucochallenge.user.shared.MobileNumberFormatter;
 
 @Component
 public class NotificationConfirmationService implements ConfirmationNotificationService {
 
     static final String TEMPLATE_KEY = "user.register.confirmation";
-    static final String EMAIL_SUBJECT_CODE = "user.register.confirmation.email.subject";
-    static final String EMAIL_BODY_CODE = "user.register.confirmation.email.body";
-    static final String SMS_MESSAGE_CODE = "user.register.confirmation.sms";
+    static final String EMAIL_SUBJECT_CODE = "user.confirmation.email.subject";
+    static final String EMAIL_BODY_CODE = "user.confirmation.email.body";
+    static final String SMS_MESSAGE_CODE = "user.confirmation.mobile.body";
 
     private static final Logger log = LoggerFactory.getLogger(NotificationConfirmationService.class);
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -30,39 +31,63 @@ public class NotificationConfirmationService implements ConfirmationNotification
 
     private final NotificationCatalogPort notificationCatalog;
     private final MessageCatalogPort messageCatalog;
+    private final MobileNumberFormatter mobileNumberFormatter;
 
     public NotificationConfirmationService(
             final NotificationCatalogPort notificationCatalog,
-            final MessageCatalogPort messageCatalog) {
+            final MessageCatalogPort messageCatalog,
+            final MobileNumberFormatter mobileNumberFormatter) {
         this.notificationCatalog = notificationCatalog;
         this.messageCatalog = messageCatalog;
+        this.mobileNumberFormatter = mobileNumberFormatter;
     }
 
     @Override
-    public void notify(final RegisterUserDomain user) {
-        if (ObjectHelper.isNull(user)) {
+    public void sendEmailConfirmation(final UserConfirmationDomain user) {
+        if (ObjectHelper.isNull(user) || TextHelper.isEmpty(user.email())) {
             return;
         }
-
-        if (!hasContactInformation(user)) {
-            log.debug("Usuario sin datos de contacto para notificar confirmación. userId={}", user.id());
+        if (TextHelper.isEmpty(user.emailConfirmationToken())) {
+            log.debug("Usuario sin token de confirmación de correo. Se omite notificación. userId={}", user.id());
             return;
-        }
-
-        if (TextHelper.isEmpty(user.mobileConfirmationToken())) {
-            log.debug("Usuario sin token de confirmación móvil. Se omite notificación SMS. userId={}", user.id());
         }
 
         try {
             final var subject = resolveMessage(EMAIL_SUBJECT_CODE,
-                    () -> "Confirma tu cuenta en UCO Challenge");
-            final var emailBody = resolveMessage(EMAIL_BODY_CODE,
+                    () -> "Confirma tu correo en UCO Challenge",
+                    user.displayName());
+            final var body = resolveMessage(EMAIL_BODY_CODE,
                     () -> defaultEmailBody(user),
-                    user.firstName(),
+                    user.displayName(),
                     user.emailConfirmationToken(),
-                    formatDate(user.emailConfirmationExpiresAt()),
-                    user.mobileConfirmationToken(),
-                    formatDate(user.mobileConfirmationExpiresAt()));
+                    formatDate(user.emailConfirmationExpiresAt()));
+
+            final var command = new NotificationCommand(
+                    TEMPLATE_KEY,
+                    user.email(),
+                    subject,
+                    body,
+                    TextHelper.getDefault(),
+                    TextHelper.getDefault());
+
+            notificationCatalog.send(command);
+        } catch (Exception ex) {
+            log.error("Error enviando notificación de confirmación de correo para userId={}: {}",
+                    user.id(), ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void sendMobileConfirmation(final UserConfirmationDomain user) {
+        if (ObjectHelper.isNull(user) || TextHelper.isEmpty(user.mobileNumber())) {
+            return;
+        }
+        if (TextHelper.isEmpty(user.mobileConfirmationToken())) {
+            log.debug("Usuario sin token de confirmación móvil. Se omite notificación. userId={}", user.id());
+            return;
+        }
+
+        try {
             final var smsMessage = resolveMessage(SMS_MESSAGE_CODE,
                     () -> defaultSmsMessage(user),
                     user.mobileConfirmationToken(),
@@ -70,21 +95,17 @@ public class NotificationConfirmationService implements ConfirmationNotification
 
             final var command = new NotificationCommand(
                     TEMPLATE_KEY,
-                    user.email(),
-                    subject,
-                    emailBody,
-                    user.mobileNumber(),
+                    TextHelper.getDefault(),
+                    TextHelper.getDefault(),
+                    TextHelper.getDefault(),
+                    mobileNumberFormatter.format(user.mobileNumber()),
                     smsMessage);
 
             notificationCatalog.send(command);
         } catch (Exception ex) {
-            log.error("Error enviando notificación de confirmación para userId={}: {}",
+            log.error("Error enviando notificación de confirmación móvil para userId={}: {}",
                     user.id(), ex.getMessage(), ex);
         }
-    }
-
-    private boolean hasContactInformation(final RegisterUserDomain user) {
-        return !TextHelper.isEmpty(user.email()) || !TextHelper.isEmpty(user.mobileNumber());
     }
 
     private String resolveMessage(final String code, final java.util.function.Supplier<String> fallback,
@@ -101,44 +122,28 @@ public class NotificationConfirmationService implements ConfirmationNotification
         }
     }
 
-    private String defaultEmailBody(final RegisterUserDomain user) {
-        final var greetingName = TextHelper.isEmpty(user.firstName()) ? "Hola" : user.firstName();
+    private String defaultEmailBody(final UserConfirmationDomain user) {
+        final var greetingName = TextHelper.isEmpty(user.displayName()) ? "Hola" : user.displayName();
         final var emailToken = TextHelper.getDefaultWithTrim(user.emailConfirmationToken());
         final var emailExpiry = formatDate(user.emailConfirmationExpiresAt());
-        final var smsToken = TextHelper.getDefaultWithTrim(user.mobileConfirmationToken());
-        final var smsExpiry = formatDate(user.mobileConfirmationExpiresAt());
 
         final var builder = new StringBuilder(greetingName)
-                .append(", completa la activación de tu cuenta.")
+                .append(", confirma tu dirección de correo electrónico.")
                 .append(System.lineSeparator());
 
-        if (!TextHelper.isEmpty(emailToken)) {
-            builder.append("Código de confirmación de correo: ")
-                    .append(emailToken);
-            if (!TextHelper.isEmpty(emailExpiry)) {
-                builder.append(" (vigente hasta ").append(emailExpiry).append(")");
-            }
-            builder.append(System.lineSeparator());
+        builder.append("Código de confirmación: ")
+                .append(emailToken);
+        if (!TextHelper.isEmpty(emailExpiry)) {
+            builder.append(" (vigente hasta ").append(emailExpiry).append(")");
         }
+        builder.append(System.lineSeparator())
+                .append("Si no solicitaste esta cuenta, ignora este mensaje.");
 
-        if (!TextHelper.isEmpty(smsToken)) {
-            builder.append("Código de confirmación de teléfono: ")
-                    .append(smsToken);
-            if (!TextHelper.isEmpty(smsExpiry)) {
-                builder.append(" (vigente hasta ").append(smsExpiry).append(")");
-            }
-            builder.append(System.lineSeparator());
-        }
-
-        builder.append("Si no solicitaste esta cuenta, ignora este mensaje.");
         return builder.toString();
     }
 
-    private String defaultSmsMessage(final RegisterUserDomain user) {
+    private String defaultSmsMessage(final UserConfirmationDomain user) {
         final var token = TextHelper.getDefaultWithTrim(user.mobileConfirmationToken());
-        if (TextHelper.isEmpty(token)) {
-            return TextHelper.getDefault();
-        }
         final var expiry = formatDate(user.mobileConfirmationExpiresAt());
         final var builder = new StringBuilder("Tu código de verificación es: ")
                 .append(token);

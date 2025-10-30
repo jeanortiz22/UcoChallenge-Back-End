@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeApplicationException;
 import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
 import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.specification.Specification;
+import co.edu.uco.ucochallenge.user.confirmation.application.service.ConfirmationNotificationService;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.RegisterUserUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
 import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUserGateway;
@@ -19,14 +20,12 @@ import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specificati
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.UniqueMobileNumberSpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.ExistingHomeCitySpecification;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.specification.GenerateConfirmationTokensSpecification;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.ConfirmationNotificationService;
 
 @Service
 public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 
     private final RegisterUserGateway registerUserGateway;
     private final Specification<RegisterUserDomain> registerUserSpecification;
-    private final ConfirmationNotificationService confirmationNotificationService;
 
     public RegisterUserUseCaseImpl(
             final RegisterUserGateway registerUserGateway,
@@ -34,7 +33,6 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
             final DuplicateRegistrationNotifier duplicateRegistrationNotifier,
             final ConfirmationNotificationService confirmationNotificationService) {
         this.registerUserGateway = registerUserGateway;
-        this.confirmationNotificationService = confirmationNotificationService;
         this.registerUserSpecification = Specification.<RegisterUserDomain>identity()
         		.and(new ExistingHomeCitySpecification(registerUserGateway))
                 .and(new GenerateUniqueUserIdentifierSpecification(registerUserGateway))
@@ -45,18 +43,17 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 
     	}
         
-    	@Override
-    	public RegisterUserResultDomain execute(final RegisterUserInputDomain inputDomain) {
-    		if (ObjectHelper.isNull(inputDomain)) {
-    			throw UcoChallengeApplicationException.create(
-    					RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
-    					"Register user input domain is required");
+	    @Override
+	    public RegisterUserResultDomain execute(final RegisterUserInputDomain inputDomain) {
+	        if (ObjectHelper.isNull(inputDomain)) {
+	            throw UcoChallengeApplicationException.create(
+	                    RegisterUserMessageCode.INPUT_DOMAIN_REQUIRED,
+	                    "Register user input domain is required");
         }
         
-        final var domain = RegisterUserDomain.fromInput(inputDomain);
-        final var validatedDomain = registerUserSpecification.apply(domain);
-        registerUserGateway.save(validatedDomain);
-        confirmationNotificationService.notify(validatedDomain);
-        return RegisterUserResultDomain.success(validatedDomain.id());
+	        final var domain = RegisterUserDomain.fromInput(inputDomain);
+	        final var validatedDomain = registerUserSpecification.apply(domain);
+	        registerUserGateway.save(validatedDomain);
+	        return RegisterUserResultDomain.success(validatedDomain.id());
     }
 }

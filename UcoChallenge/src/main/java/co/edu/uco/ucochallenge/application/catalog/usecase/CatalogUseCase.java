@@ -16,4 +16,6 @@ public interface CatalogUseCase {
     List<StateDomain> listStates(UUID countryId);
 
     List<CityDomain> listCities(UUID stateId);
+    
+    CityDomain getCity(UUID cityId);
 }

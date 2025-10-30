@@ -39,4 +39,9 @@ public class CatalogUseCaseImpl implements CatalogUseCase {
     public List<CityDomain> listCities(final UUID stateId) {
         return gateway.listCities(stateId);
     }
+    
+    @Override
+    public CityDomain getCity(final UUID cityId) {
+		return gateway.getCity(cityId);
+	}
 }

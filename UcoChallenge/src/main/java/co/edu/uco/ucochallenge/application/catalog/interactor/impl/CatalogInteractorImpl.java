@@ -53,4 +53,11 @@ public class CatalogInteractorImpl implements CatalogInteractor {
                 .toList();
     }
     
+    @Override
+    public CityDTO getCity(final UUID cityId) {
+        final var sanitizedCityId = Objects.requireNonNull(cityId, "cityId is required");
+        final var domain = useCase.getCity(sanitizedCityId);
+        return new CityDTO(domain.getId(), domain.getName(), domain.getStateId());
+    }
+    
 }

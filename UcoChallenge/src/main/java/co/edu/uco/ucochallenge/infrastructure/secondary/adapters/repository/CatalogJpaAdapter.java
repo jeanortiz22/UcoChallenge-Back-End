@@ -14,6 +14,8 @@ import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.enti
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.CountryEntity;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.IdTypeEntity;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.StateEntity;
+import co.edu.uco.ucochallenge.application.catalog.messages.CatalogMessageCode;
+import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeBusinessException;
 
 @Component
 public class CatalogJpaAdapter implements CatalogGateway {
@@ -62,6 +64,17 @@ public class CatalogJpaAdapter implements CatalogGateway {
         return cityRepository.findByState_Id(sanitizedStateId).stream()
                 .map(this::mapCity)
                 .toList();
+    }
+    
+    @Override
+    public CityDomain getCity(final UUID cityId) {
+        final var sanitizedCityId = Objects.requireNonNull(cityId, "cityId is required");
+        return cityRepository.findById(sanitizedCityId)
+                .map(this::mapCity)
+                .orElseThrow(() -> UcoChallengeBusinessException.create(
+                        CatalogMessageCode.CITY_NOT_FOUND,
+                        "City not found",
+                        sanitizedCityId));
     }
 
     private CatalogItemDomain mapIdType(final IdTypeEntity entity) {
