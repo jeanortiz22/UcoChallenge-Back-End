@@ -1,11 +1,10 @@
 package co.edu.uco.ucochallenge.infrastructure.primary.controller;
 
-import java.util.List;
 import java.util.UUID;
 
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +22,6 @@ import co.edu.uco.ucochallenge.user.confirmation.application.interactor.dto.Veri
 import co.edu.uco.ucochallenge.user.listusers.application.interactor.ListUsersInteractor;
 import co.edu.uco.ucochallenge.user.listusers.application.interactor.dto.ListUsersRequestDTO;
 import co.edu.uco.ucochallenge.user.listusers.application.interactor.dto.PagedUsersResponseDTO;
-import co.edu.uco.ucochallenge.user.listusers.application.interactor.dto.UserResponseDTO;
 
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.RegisterUserInteractor;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.RegisterUserInputDTO;
@@ -49,6 +47,7 @@ public class UserController {
         this.verifyConfirmationCodeInteractor = verifyConfirmationCodeInteractor;
     }
     
+    @PreAuthorize("hasAuthority('read:users')")
     @GetMapping
     public ResponseEntity<PagedUsersResponseDTO> getAllUsers(
             @RequestParam(name = "page", required = false) final Integer page,
@@ -59,6 +58,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @PreAuthorize("hasAuthority('create:users')")
     @PostMapping
     public ResponseEntity<RegisterUserResponseDTO> registerUser(
             @jakarta.validation.Valid @RequestBody final RegisterUserInputDTO dto) {
@@ -68,6 +68,7 @@ public class UserController {
     }
 
     
+    @PreAuthorize("hasAuthority('create:users')")
     @PostMapping("/{userId}/confirmaciones/{channel}")
     public ResponseEntity<UserConfirmationResponseDTO> sendConfirmation(
             @PathVariable("userId") final UUID userId,
@@ -78,6 +79,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
+    @PreAuthorize("hasAuthority('create:users')")
     @PostMapping("/{userId}/confirmaciones/{channel}/verificacion")
     public ResponseEntity<UserConfirmationResponseDTO> verifyConfirmation(
             @PathVariable("userId") final UUID userId,
