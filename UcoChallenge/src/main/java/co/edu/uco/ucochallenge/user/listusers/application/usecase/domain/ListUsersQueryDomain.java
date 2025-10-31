@@ -5,7 +5,7 @@ import java.util.Objects;
 public final class ListUsersQueryDomain {
 
     private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_SIZE = 20;
+    private static final int DEFAULT_SIZE = 5;
     private static final int MIN_SIZE = 1;
     private static final int MAX_SIZE = 100;
 

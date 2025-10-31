@@ -3,6 +3,7 @@ package co.edu.uco.ucochallenge.infrastructure.primary.controller;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,12 +60,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<RegisterUserResponseDTO> registerUser(@RequestBody final RegisterUserInputDTO dto) {
+    public ResponseEntity<RegisterUserResponseDTO> registerUser(
+            @jakarta.validation.Valid @RequestBody final RegisterUserInputDTO dto) {
         final var normalizedDto = RegisterUserInputDTO.normalize(dto);
         final var response = registerUserInteractor.execute(normalizedDto);
-    	
-    	return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     
     @PostMapping("/{userId}/confirmaciones/{channel}")
     public ResponseEntity<UserConfirmationResponseDTO> sendConfirmation(

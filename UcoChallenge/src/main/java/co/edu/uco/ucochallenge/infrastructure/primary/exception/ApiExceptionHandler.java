@@ -44,8 +44,10 @@ public class ApiExceptionHandler {
     public ResponseEntity<ResponseError> handleApplication(UcoChallengeApplicationException ex, Locale locale) {
     	return build(ex, ResponseErrorType.APPLICATION, HttpStatus.BAD_REQUEST, locale);
     }
-    
- 
+
+
+
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseError> handleOthers(Exception ex, Locale locale) {
         log.error("Excepción no controlada: {}", ex.getMessage(), ex);
