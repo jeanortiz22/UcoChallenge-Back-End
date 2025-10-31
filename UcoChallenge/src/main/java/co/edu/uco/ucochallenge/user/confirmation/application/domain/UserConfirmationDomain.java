@@ -31,9 +31,9 @@ public record UserConfirmationDomain(
         email = TextHelper.getDefaultWithTrim(email);
         mobileNumber = TextHelper.getDefaultWithTrim(mobileNumber);
         emailConfirmationToken = TextHelper.getDefaultWithTrim(emailConfirmationToken);
-        emailConfirmationExpiresAt = ObjectHelper.getDefault(emailConfirmationExpiresAt, LocalDateTime.MIN);
+        emailConfirmationExpiresAt = sanitizeTimestamp(emailConfirmationExpiresAt);
         mobileConfirmationToken = TextHelper.getDefaultWithTrim(mobileConfirmationToken);
-        mobileConfirmationExpiresAt = ObjectHelper.getDefault(mobileConfirmationExpiresAt, LocalDateTime.MIN);
+        mobileConfirmationExpiresAt = sanitizeTimestamp(mobileConfirmationExpiresAt);
     }
 
     public String displayName() {
@@ -67,7 +67,7 @@ public record UserConfirmationDomain(
                 email,
                 mobileNumber,
                 TextHelper.getDefaultWithTrim(token),
-                ObjectHelper.getDefault(expiresAt, LocalDateTime.MIN),
+                sanitizeTimestamp(expiresAt),
                 false,
                 mobileConfirmationToken,
                 mobileConfirmationExpiresAt,
@@ -87,7 +87,7 @@ public record UserConfirmationDomain(
                 emailConfirmationExpiresAt,
                 emailConfirmed,
                 TextHelper.getDefaultWithTrim(token),
-                ObjectHelper.getDefault(expiresAt, LocalDateTime.MIN),
+                sanitizeTimestamp(expiresAt),
                 false);
     }
 
@@ -101,7 +101,7 @@ public record UserConfirmationDomain(
                 email,
                 mobileNumber,
                 TextHelper.getDefault(),
-                LocalDateTime.MIN,
+                null,
                 true,
                 mobileConfirmationToken,
                 mobileConfirmationExpiresAt,
@@ -121,11 +121,18 @@ public record UserConfirmationDomain(
                 emailConfirmationExpiresAt,
                 emailConfirmed,
                 TextHelper.getDefault(),
-                LocalDateTime.MIN,
+                null,
                 true);
     }
 
     public boolean isAccountActivated() {
         return emailConfirmed && mobileNumberConfirmed;
+    }
+    
+    private static LocalDateTime sanitizeTimestamp(final LocalDateTime value) {
+        if (ObjectHelper.isNull(value) || LocalDateTime.MIN.equals(value)) {
+            return null;
+        }
+        return value;
     }
 }

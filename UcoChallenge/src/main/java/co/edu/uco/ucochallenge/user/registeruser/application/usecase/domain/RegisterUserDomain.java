@@ -41,9 +41,10 @@ public record RegisterUserDomain(
 	        email = TextHelper.getDefaultWithTrim(email);
 	        mobileNumber = TextHelper.getDefaultWithTrim(mobileNumber);
 	        emailConfirmationToken = TextHelper.getDefaultWithTrim(emailConfirmationToken);
-	        emailConfirmationExpiresAt = ObjectHelper.getDefault(emailConfirmationExpiresAt, LocalDateTime.MIN);
-	        mobileConfirmationToken = TextHelper.getDefaultWithTrim(mobileConfirmationToken);
-	        mobileConfirmationExpiresAt = ObjectHelper.getDefault(mobileConfirmationExpiresAt, LocalDateTime.MIN);
+            emailConfirmationExpiresAt = sanitizeTimestamp(emailConfirmationExpiresAt);
+            mobileConfirmationToken = TextHelper.getDefaultWithTrim(mobileConfirmationToken);
+            mobileConfirmationExpiresAt = sanitizeTimestamp(mobileConfirmationExpiresAt);
+   
 	    }
 
 	    public static RegisterUserDomain fromInput(final RegisterUserInputDomain inputDomain) {
@@ -65,9 +66,9 @@ public record RegisterUserDomain(
             inputDomain.email(),
             inputDomain.mobileNumber(),
             TextHelper.getDefault(),
-            LocalDateTime.MIN,
+            null,
             TextHelper.getDefault(),
-            LocalDateTime.MIN);
+            null);
 
             }
 
@@ -114,16 +115,23 @@ public record RegisterUserDomain(
             }
             
             
-	    private static UUID validateIdentifier(
-			final UUID value,
-	        final String messageCode,
-	        final String message,
-	        final String fieldName) {
-	        final var sanitized = UUIDHelper.getDefault(value);
-	        if (UUIDHelper.getDefault().equals(sanitized)) {
-	        	throw UcoChallengeApplicationException.create(messageCode, message, fieldName);
-	        }
-	        return sanitized;
-	    }
+            private static UUID validateIdentifier(
+                    final UUID value,
+            final String messageCode,
+            final String message,
+            final String fieldName) {
+            final var sanitized = UUIDHelper.getDefault(value);
+            if (UUIDHelper.getDefault().equals(sanitized)) {
+                    throw UcoChallengeApplicationException.create(messageCode, message, fieldName);
+            }
+            return sanitized;
+        }
+
+        private static LocalDateTime sanitizeTimestamp(final LocalDateTime value) {
+            if (ObjectHelper.isNull(value) || LocalDateTime.MIN.equals(value)) {
+                return null;
+            }
+            return value;
+        }
 
 }

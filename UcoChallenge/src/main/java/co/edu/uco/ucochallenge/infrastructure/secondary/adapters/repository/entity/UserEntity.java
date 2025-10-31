@@ -90,9 +90,9 @@ public class UserEntity {
         setEmail(TextHelper.getDefault());
         setMobileNumber(TextHelper.getDefault());
         setEmailConfirmationToken(TextHelper.getDefault());
-        setEmailConfirmationExpiresAt(LocalDateTime.MIN);
+        setEmailConfirmationExpiresAt(null);
         setMobileConfirmationToken(TextHelper.getDefault());
-        setMobileConfirmationExpiresAt(LocalDateTime.MIN);
+        setMobileConfirmationExpiresAt(null);
         setEmailConfirmed(false);
         setMobileNumberConfirmed(false);
         setEmailConfirmedIsDefaultValue(true);
@@ -345,16 +345,16 @@ public class UserEntity {
 	}
 	
 	private void setEmailConfirmationExpiresAt(final LocalDateTime emailConfirmationExpiresAt) {
-	        this.emailConfirmationExpiresAt = ObjectHelper.getDefault(emailConfirmationExpiresAt, LocalDateTime.MIN);
-	}
+        this.emailConfirmationExpiresAt = normalizeTimestamp(emailConfirmationExpiresAt);
+}
 	
 	private void setMobileConfirmationToken(final String mobileConfirmationToken) {
 	        this.mobileConfirmationToken = TextHelper.getDefaultWithTrim(mobileConfirmationToken);
 	}
 	
 	private void setMobileConfirmationExpiresAt(final LocalDateTime mobileConfirmationExpiresAt) {
-	        this.mobileConfirmationExpiresAt = ObjectHelper.getDefault(mobileConfirmationExpiresAt, LocalDateTime.MIN);
-	}
+        this.mobileConfirmationExpiresAt = normalizeTimestamp(mobileConfirmationExpiresAt);
+}
 	
 	private void setEmailConfirmed(final boolean emailConfirmed) {
 	        this.emailConfirmed = emailConfirmed;
@@ -384,5 +384,12 @@ public class UserEntity {
         setMobileConfirmationExpiresAt(expiresAt);
         setMobileNumberConfirmed(confirmed);
         setMobileNumberConfirmedIsDefaultValue(false);
+    }
+    
+    private LocalDateTime normalizeTimestamp(final LocalDateTime value) {
+        if (ObjectHelper.isNull(value) || LocalDateTime.MIN.equals(value)) {
+            return null;
+        }
+        return value;
     }
 }

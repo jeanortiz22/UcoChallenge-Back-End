@@ -28,6 +28,7 @@ public class DefaultConfirmationTokenService implements ConfirmationTokenService
     static final String SMS_TOKEN_TTL_CODE = "USER.REGISTER.SMS_TOKEN_TTL_MIN";
     private static final int DEFAULT_EMAIL_TOKEN_TTL = 1_440;
     private static final int DEFAULT_SMS_TOKEN_TTL = 10;
+    private static final String CATALOG_UNAVAILABLE_PLACEHOLDER = "[CATALOGO_PARAMETROS_NO_DISPONIBLE]";
     private static final int EMAIL_TOKEN_LENGTH = 6;
     private static final int SMS_TOKEN_LENGTH = 6;
     private static final String EMAIL_TOKEN_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -74,6 +75,9 @@ public class DefaultConfirmationTokenService implements ConfirmationTokenService
             final var value = parameterCatalog.get(parameterCode, Locale.getDefault());
             final var sanitized = TextHelper.getDefaultWithTrim(value);
             if (TextHelper.isEmpty(sanitized)) {
+                return defaultValue;
+            }
+            if (CATALOG_UNAVAILABLE_PLACEHOLDER.equalsIgnoreCase(sanitized)) {
                 return defaultValue;
             }
             final var parsed = Integer.parseInt(sanitized);
