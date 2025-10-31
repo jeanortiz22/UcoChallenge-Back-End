@@ -12,5 +12,7 @@ public record UserResponseDTO(
         String secondSurname,
         UUID homeCity,
         String email,
-        String mobileNumber) {
+        String mobileNumber,
+        boolean emailConfirmed,
+        boolean mobileNumberConfirmed) {
 }

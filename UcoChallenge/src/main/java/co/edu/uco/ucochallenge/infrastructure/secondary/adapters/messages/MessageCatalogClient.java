@@ -31,7 +31,8 @@ public class MessageCatalogClient implements MessageCatalogPort {
             cacheNames = "messages",
             // ¡OJO! usar #p1 (segundo parámetro) para evitar conflicto con la variable especial #args de SpEL
             key = "#code + '|' + T(java.util.Locale).getDefault().toLanguageTag() + '|' + T(java.util.Arrays).deepToString(#p1)",
-            unless = "#result == null || #result.isBlank() || #result.startsWith('[')"
+            unless = "#result == null || #result.isBlank() || T(co.edu.uco.ucochallenge.infrastructure."
+            		+ "secondary.adapters.messages.MessageCatalogFallback).isFallback(#code, #p1, #result)"
     )
     public String format(String code, Object... args) {
         try {
@@ -57,24 +58,24 @@ public class MessageCatalogClient implements MessageCatalogPort {
 
             if (dto == null) {
                 log.warn("DTO nulo desde catálogo para code={}", code);
-                return "[" + code + "]";
+                return fallbackMessage(code, args);
             }
             log.debug("DTO recibido: key={}, template={}", dto.key(), dto.template());
 
-            String template = (dto.template() == null || dto.template().isBlank())
-                    ? "[" + code + "]"
-                    : dto.template();
+            if (dto.template() == null || dto.template().isBlank()) {
+                return fallbackMessage(code, args);
+            }
 
             try {
-                return MessageFormat.format(template, args);
+            	return MessageFormat.format(dto.template(), args);
             } catch (IllegalArgumentException iae) {
                 log.error("Error formateando plantilla: template='{}', args={}. {}",
-                        template, Arrays.toString(args), iae.getMessage());
-                return "[" + code + "]";
+                		dto.template(), Arrays.toString(args), iae.getMessage());
+                return fallbackMessage(code, args);
             }
         } catch (Exception e) {
             log.error("Fallo consultando catálogo para code={}: {}", code, e.getMessage());
-            return "[APLICACION_NO_DISPONIBLE]";
+            return fallbackMessage(code, args);
         }
     }
 
@@ -83,5 +84,19 @@ public class MessageCatalogClient implements MessageCatalogPort {
         return format(code, args);
     }
 
-    public record MessageDto(String key, String template) {}
+    public record MessageDto(String key, String template) {
+    	
+    }
+    
+    private String fallbackMessage(final String code, final Object... args) {
+        final var fallback = MessageCatalogFallback.format(code, args);
+        if (fallback != null && !fallback.isBlank()) {
+            return fallback;
+        }
+        if (code == null || code.isBlank()) {
+            return "[APLICACION_NO_DISPONIBLE]";
+        }
+        return "[" + code + "]";
+    }
+    
 }

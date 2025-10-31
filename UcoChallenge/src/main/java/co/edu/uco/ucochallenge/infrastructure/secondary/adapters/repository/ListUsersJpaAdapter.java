@@ -54,6 +54,8 @@ public class ListUsersJpaAdapter implements ListUsersGateway {
                 entity.getSecondSurname(),
                 Objects.nonNull(homeCity) ? homeCity.getId() : null,
                 entity.getEmail(),
-                entity.getMobileNumber());
+                entity.getMobileNumber(),
+                entity.isEmailConfirmed(),
+                entity.isMobileNumberConfirmed());
     }
 }

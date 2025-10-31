@@ -17,6 +17,8 @@ public final class UserSummaryDomain {
     private final UUID homeCity;
     private final String email;
     private final String mobileNumber;
+    private final boolean emailConfirmed;
+    private final boolean mobileNumberConfirmed;
 
     private UserSummaryDomain(
             final UUID id,
@@ -28,7 +30,9 @@ public final class UserSummaryDomain {
             final String secondSurname,
             final UUID homeCity,
             final String email,
-            final String mobileNumber) {
+            final String mobileNumber,
+            final boolean emailConfirmed,
+            final boolean mobileNumberConfirmed) {
 
         this.id = UUIDHelper.getDefault(id);
         this.idType = UUIDHelper.getDefault(idType);
@@ -40,6 +44,8 @@ public final class UserSummaryDomain {
         this.homeCity = UUIDHelper.getDefault(homeCity);
         this.email = TextHelper.getDefaultWithTrim(email);
         this.mobileNumber = TextHelper.getDefaultWithTrim(mobileNumber);
+        this.emailConfirmed = emailConfirmed;
+        this.mobileNumberConfirmed = mobileNumberConfirmed;
     }
 
     public static UserSummaryDomain create(
@@ -52,7 +58,9 @@ public final class UserSummaryDomain {
             final String secondSurname,
             final UUID homeCity,
             final String email,
-            final String mobileNumber) {
+            final String mobileNumber,
+            final boolean emailConfirmed,
+            final boolean mobileNumberConfirmed) {
 
         return new UserSummaryDomain(
                 id,
@@ -64,7 +72,9 @@ public final class UserSummaryDomain {
                 secondSurname,
                 homeCity,
                 email,
-                mobileNumber);
+                mobileNumber,
+                emailConfirmed,
+                mobileNumberConfirmed);
     }
 
     public UUID getId() {
@@ -105,5 +115,13 @@ public final class UserSummaryDomain {
 
     public String getMobileNumber() {
         return mobileNumber;
+    }
+    
+    public boolean isEmailConfirmed() {
+        return emailConfirmed;
+    }
+
+    public boolean isMobileNumberConfirmed() {
+        return mobileNumberConfirmed;
     }
 }

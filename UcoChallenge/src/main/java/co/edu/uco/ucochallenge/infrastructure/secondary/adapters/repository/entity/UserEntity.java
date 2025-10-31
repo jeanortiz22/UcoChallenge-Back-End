@@ -354,7 +354,7 @@ public class UserEntity {
 	
 	private void setMobileConfirmationExpiresAt(final LocalDateTime mobileConfirmationExpiresAt) {
         this.mobileConfirmationExpiresAt = normalizeTimestamp(mobileConfirmationExpiresAt);
-}
+	}
 	
 	private void setEmailConfirmed(final boolean emailConfirmed) {
 	        this.emailConfirmed = emailConfirmed;

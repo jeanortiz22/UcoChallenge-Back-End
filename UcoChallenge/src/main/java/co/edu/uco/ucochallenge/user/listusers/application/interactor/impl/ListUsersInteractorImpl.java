@@ -41,7 +41,9 @@ public class ListUsersInteractorImpl implements ListUsersInteractor {
                         domain.getSecondSurname(),
                         domain.getHomeCity(),
                         domain.getEmail(),
-                        domain.getMobileNumber()))
+                        domain.getMobileNumber(),
+                        domain.isEmailConfirmed(),
+                        domain.isMobileNumberConfirmed()))
                 .toList();
 
         return PagedUsersResponseDTO.from(pageDomain, users);
