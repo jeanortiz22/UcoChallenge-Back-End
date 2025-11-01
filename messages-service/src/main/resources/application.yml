@@ -6,15 +6,17 @@ spring:
     name: messages-service
 
   cache:
-    type: redis   # activa cache redis
+    type: redis  # activa cache redis
 
   data:
     redis:
-      host: localhost     # Redis corre en tu máquina / contenedor local
-      port: 6379          # Puerto por defecto
-      password:           # SIN contraseña en local
+      url: ${REDIS_URL:rediss://default:AU7sAAIncDI5YWYzZjJiZDA2ZjI0YTNiYTNiMDE2YWM4ZGY5ZGJhM3AyMjAyMDQ@real-eft-20204.upstash.io:6379}
+      host: ${REDIS_HOST:real-eft-20204.upstash.io}
+      port: ${REDIS_PORT:6379}
+      username: ${REDIS_USERNAME:default}
+      password: ${REDIS_PASSWORD:AU7sAAIncDI5YWYzZjJiZDA2ZjI0YTNiYTNiMDE2YWM4ZGY5ZGJhM3AyMjAyMDQ}
       ssl:
-        enabled: false    # SIN SSL en local
+        enabled: false  # SIN SSL en local
 
 management:
   endpoints:
@@ -25,4 +27,4 @@ management:
 gateway:
   security:
     header: X-Gateway-Request
-    secret: AdminUco2024   # ← valor normal, sin variables
+    secret: AdminUco2024

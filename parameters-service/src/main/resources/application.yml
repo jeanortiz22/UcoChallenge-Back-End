@@ -5,6 +5,24 @@ spring:
   application:
     name: parameters-service
 
+  cache:
+    type: redis  # activa cache redis
+
+  data:
+    redis:
+      url: ${REDIS_URL:rediss://default:AU7sAAIncDI5YWYzZjJiZDA2ZjI0YTNiYTNiMDE2YWM4ZGY5ZGJhM3AyMjAyMDQ@real-eft-20204.upstash.io:6379}
+      host: ${REDIS_HOST:real-eft-20204.upstash.io}
+      port: ${REDIS_PORT:6379}
+      username: ${REDIS_USERNAME:default}
+      password: ${REDIS_PASSWORD:AU7sAAIncDI5YWYzZjJiZDA2ZjI0YTNiYTNiMDE2YWM4ZGY5ZGJhM3AyMjAyMDQ}
+      ssl:
+        enabled: true  # Upstash usa SSL obligatorio
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,caches
 
 gateway:
   security:

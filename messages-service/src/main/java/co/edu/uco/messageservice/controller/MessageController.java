@@ -11,15 +11,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/messages/api/v1/messages")
 public class MessageController {
+	
+	private final MessageCatalog catalog;
+
+    public MessageController(MessageCatalog catalog) {
+        this.catalog = catalog;
+    }
 
     @GetMapping
     public ResponseEntity<Map<String, Message>> getAll() {
-        return ResponseEntity.ok(MessageCatalog.getAll());
+    	return ResponseEntity.ok(catalog.getAll());
     }
 
     @GetMapping("/{key}")
     public ResponseEntity<Message> getByKey(@PathVariable String key) {
-        return MessageCatalog.get(key)
+    	return catalog.get(key)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -29,16 +35,15 @@ public class MessageController {
         if (message == null || message.getKey() == null || !key.equals(message.getKey())) {
             return ResponseEntity.badRequest().build();
         }
-        MessageCatalog.upsert(message);
+        catalog.upsert(message);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{key}")
     public ResponseEntity<Void> delete(@PathVariable String key) {
-        if (MessageCatalog.get(key).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    	if (catalog.remove(key)) {
+            return ResponseEntity.noContent().build();
         }
-        MessageCatalog.remove(key);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

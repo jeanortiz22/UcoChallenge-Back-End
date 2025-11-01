@@ -67,11 +67,31 @@
     </dependency>
     
     <dependency>
+	  <groupId>org.springframework.boot</groupId>
+	  <artifactId>spring-boot-starter-actuator</artifactId>
+	</dependency>
+
+    <!-- PostgreSQL Driver -->
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
+   
     
+	    <!-- Satisface al SDK de NotificationAPI (usa HttpClient 4.x) -->
+	<dependency>
+	  <groupId>org.apache.httpcomponents</groupId>
+	  <artifactId>httpclient</artifactId>
+	  <version>4.5.14</version>
+	  <exclusions>
+	    <exclusion>
+	      <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+	    </exclusion>
+	  </exclusions>
+	</dependency>
+
     <!-- OpenAPI / Swagger UI -->
     <dependency>
       <groupId>org.springdoc</groupId>
@@ -81,16 +101,20 @@
     
      <!-- 	Notificaciones  -->
     <dependency>
-      <groupId>com.notificationapi</groupId>
-      <artifactId>notificationapi-java-server-sdk</artifactId>
-      <version>0.3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.5.14</version>
-    </dependency>
+	  <groupId>com.notificationapi</groupId>
+	  <artifactId>notificationapi-java-server-sdk</artifactId>
+	  <version>0.3.0</version>
+	  <exclusions>
+	    <exclusion>
+	      <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.apache.httpcomponents</groupId>
+	      <artifactId>httpclient</artifactId> <!-- 4.x -->
+	    </exclusion>
+	  </exclusions>
+	</dependency>
 
     <!-- Seguridad / JWT -->
     <dependency>

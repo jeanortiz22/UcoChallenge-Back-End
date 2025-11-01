@@ -11,15 +11,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/notifications/api/v1/templates")
 public class NotificationTemplateController {
+	
+	private final NotificationCatalog catalog;
+
+    public NotificationTemplateController(NotificationCatalog catalog) {
+        this.catalog = catalog;
+    }
 
     @GetMapping
     public ResponseEntity<Map<String, NotificationTemplate>> getAll() {
-        return ResponseEntity.ok(NotificationCatalog.getAll());
+    	return ResponseEntity.ok(catalog.getAll());
     }
 
     @GetMapping("/{key}")
     public ResponseEntity<NotificationTemplate> getByKey(@PathVariable String key) {
-        return NotificationCatalog.get(key)
+    	return catalog.get(key)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -29,16 +35,15 @@ public class NotificationTemplateController {
         if (template == null || template.getKey() == null || !key.equals(template.getKey())) {
             return ResponseEntity.badRequest().build();
         }
-        NotificationCatalog.upsert(template);
+        catalog.upsert(template);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{key}")
     public ResponseEntity<Void> delete(@PathVariable String key) {
-        if (NotificationCatalog.get(key).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    	if (catalog.remove(key)) {
+            return ResponseEntity.noContent().build();
         }
-        NotificationCatalog.remove(key);
-        return ResponseEntity.noContent().build();
+    	return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

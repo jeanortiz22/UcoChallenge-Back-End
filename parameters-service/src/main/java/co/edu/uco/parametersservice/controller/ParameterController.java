@@ -10,37 +10,43 @@ import java.util.Map;
 @RestController
 @RequestMapping("/parameters/api/v1/parameters")
 public class ParameterController {
+	
+	private final ParameterCatalog catalog;
+
+    public ParameterController(ParameterCatalog catalog) {
+        this.catalog = catalog;
+    }
 
     // Obtener todos los parámetros
     @GetMapping
     public ResponseEntity<Map<String, Parameter>> getAllParameters() {
-        return ResponseEntity.ok(ParameterCatalog.getAllParameters());
+    	return ResponseEntity.ok(catalog.getAll());
     }
 
     // Obtener un parámetro por su clave
     @GetMapping("/{key}")
     public ResponseEntity<Parameter> getParameterByKey(@PathVariable String key) {
-        Parameter parameter = ParameterCatalog.getParameterValue(key);
-        if (parameter == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(parameter);
+        return catalog.get(key)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Actualizar o agregar un parámetro
     @PutMapping("/{key}")
     public ResponseEntity<Void> synchronizeParameter(@PathVariable String key, @RequestBody Parameter parameter) {
-        if (!key.equals(parameter.getKey())) {
+    	if (parameter == null || parameter.getKey() == null || !key.equals(parameter.getKey())) {
             return ResponseEntity.badRequest().build();
         }
-        ParameterCatalog.synchronizeParameters(parameter);
+    	catalog.upsert(parameter);
         return ResponseEntity.noContent().build();
     }
 
     // Eliminar un parámetro
     @DeleteMapping("/{key}")
     public ResponseEntity<Void> deleteParameter(@PathVariable String key) {
-        ParameterCatalog.removeParameter(key);
-        return ResponseEntity.noContent().build();
+    	if (catalog.remove(key)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
