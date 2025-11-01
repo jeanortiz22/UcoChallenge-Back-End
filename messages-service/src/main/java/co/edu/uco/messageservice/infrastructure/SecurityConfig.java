@@ -1,6 +1,6 @@
 // messages-service (8083)
 // co.edu.uco.messages.infrastructure.security.SecurityConfig
-package co.edu.uco.messageservice.infrastructure.security;
+package co.edu.uco.messageservice.infrastructure;
 
 import co.edu.uco.ucochallenge.infrastructure.security.GatewayOnlyFilter; // o copia el filtro aquí y ajusta el import
 import org.springframework.beans.factory.annotation.Value;

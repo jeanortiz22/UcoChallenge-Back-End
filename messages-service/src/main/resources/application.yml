@@ -5,9 +5,24 @@ spring:
   application:
     name: messages-service
 
-# ❌ Quita por completo la sección oauth2.resourceserver.jwt
+  cache:
+    type: redis   # activa cache redis
+
+  data:
+    redis:
+      host: localhost     # Redis corre en tu máquina / contenedor local
+      port: 6379          # Puerto por defecto
+      password:           # SIN contraseña en local
+      ssl:
+        enabled: false    # SIN SSL en local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,caches
 
 gateway:
   security:
     header: X-Gateway-Request
-    secret: AdminUco2024
+    secret: AdminUco2024   # ← valor normal, sin variables

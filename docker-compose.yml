@@ -1,0 +1,21 @@
+services:
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:latest
+    container_name: datadog-agent
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=us5.datadoghq.com
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_PROFILING_ENABLED=true
+      - DD_LOGS_ENABLED=false            # ← desactiva recolección de logs de contenedores por ahora
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+    ports:
+      - "8126:8126/tcp"   # APM (traces)
+      - "8125:8125/udp"   # DogStatsD (metrics)
+    # Montajes útiles; no son obligatorios, pero ayudan en healthchecks/metrics
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+    restart: unless-stopped
