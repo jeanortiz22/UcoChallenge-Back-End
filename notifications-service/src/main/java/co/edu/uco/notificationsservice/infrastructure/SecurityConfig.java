@@ -1,4 +1,4 @@
-package co.edu.uco.notificationsservice.infrastructure.security;
+package co.edu.uco.notificationsservice.infrastructure;
 
 import co.edu.uco.ucochallenge.infrastructure.security.GatewayOnlyFilter;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +20,7 @@ public class SecurityConfig {
 
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                		.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .requestMatchers("/actuator/**", "/notifications/api/v1/health").permitAll()
                         .requestMatchers("/notifications/api/v1/templates/**").permitAll() // público si quieres probar; si no, quita este permitAll
                         .anyRequest().permitAll()

@@ -1,4 +1,4 @@
-package co.edu.uco.parametersservice.infrastructure.security;
+package co.edu.uco.parametersservice.infrastructure;
 
 import co.edu.uco.ucochallenge.infrastructure.security.GatewayOnlyFilter;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +21,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                		.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/parameters/api/v1/parameters/**").permitAll() // público o protegido según necesidad
                         .anyRequest().permitAll()
