@@ -1,4 +1,4 @@
-package co.edu.uco.messageservice.application;
+/*package co.edu.uco.messageservice.application;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,3 +25,4 @@ public class MessageQueryService {
         return catalog.get(key);
     }
 }
+*/

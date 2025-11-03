@@ -79,5 +79,5 @@ public class ParameterCatalog {
     private String normalize(String key) {
         return key == null ? null : key.trim();
     }
-	
+
 }

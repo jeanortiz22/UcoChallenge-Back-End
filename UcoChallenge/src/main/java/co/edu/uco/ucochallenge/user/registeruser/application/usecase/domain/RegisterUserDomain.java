@@ -10,7 +10,7 @@ import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
 import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 import co.edu.uco.ucochallenge.crosscuting.helper.UUIDHelper;
 import co.edu.uco.ucochallenge.user.registeruser.application.messages.RegisterUserMessageCode;
-
+import co.edu.uco.ucochallenge.user.registeruser.application.parameters.RegisterUserParameterCode;
 public record RegisterUserDomain(
 		UUID id,
 		UUID idType,
@@ -28,7 +28,7 @@ public record RegisterUserDomain(
 		LocalDateTime mobileConfirmationExpiresAt) {
 
 	// ==== Límites (negocio) ====
-	private static final int IDNUMBER_MIN = 5, IDNUMBER_MAX = 20;
+	private static final int IDNUMBER_MIN=5, IDNUMBER_MAX = 20;
 	private static final int NAME_MIN = 1, NAME_MAX = 60;
 	private static final int SURNAME_MIN = 1, SURNAME_MAX = 60;
 	private static final int OPTIONAL_NAME_MIN = 1, OPTIONAL_NAME_MAX = 60;
@@ -80,7 +80,7 @@ public record RegisterUserDomain(
 		// Documento: requerido con rango
 		ensureNonBlankAndRange("idNumber", idNumber, IDNUMBER_MIN, IDNUMBER_MAX,
 				RegisterUserMessageCode.ID_NUMBER_REQUIRED,
-				RegisterUserMessageCode.ID_NUMBER_TOO_SHORT,
+				RegisterUserMessageCode.  ID_NUMBER_TOO_SHORT,
 				RegisterUserMessageCode.ID_NUMBER_TOO_LONG);
 
 		// Nombres/apellidos obligatorios

@@ -47,9 +47,9 @@ final class MessageCatalogDefaults {
         messages.add(new Message("user.register.idNumber.required",
                 "El campo 'Número de identificación' es obligatorio."));
         messages.add(new Message("user.register.idNumber.too.short",
-                "El número de identificación debe tener al menos {0} caracteres."));
+                "El número de identificación debe tener al menos 5 caracteres."));
         messages.add(new Message("user.register.idNumber.too.long",
-                "El número de identificación no puede superar {0} caracteres."));
+                "El número de identificación no puede superar 20 caracteres."));
         messages.add(new Message("user.register.idNumber.duplicate",
                 "Ya existe un usuario con este número de identificación."));
 
@@ -57,17 +57,17 @@ final class MessageCatalogDefaults {
         messages.add(new Message("user.register.firstName.required",
                 "El campo 'Nombre' es obligatorio."));
         messages.add(new Message("user.register.firstName.too.short",
-                "El nombre debe tener al menos {0} caracteres."));
+                "El nombre debe tener al menos 1 caracteres."));
         messages.add(new Message("user.register.firstName.tooLong",
-                "El nombre no puede superar {0} caracteres."));
+                "El nombre no puede superar 60 caracteres."));
         messages.add(new Message("user.register.firstName.invalidFormat",
                 "El primer nombre solo puede contener letras y espacios."));
 
         // --- secondName (opcional) ---
         messages.add(new Message("user.register.secondName.too.short",
-                "El segundo nombre debe tener al menos {0} caracteres."));
+                "El segundo nombre debe tener al menos 1 caracteres."));
         messages.add(new Message("user.register.secondName.too.long",
-                "El segundo nombre no puede superar {0} caracteres."));
+                "El segundo nombre no puede superar 60 caracteres."));
         messages.add(new Message("user.register.secondName.invalidFormat",
                 "El segundo nombre solo puede contener letras y espacios."));
 
@@ -75,17 +75,17 @@ final class MessageCatalogDefaults {
         messages.add(new Message("user.register.firstSurname.required",
                 "El primer apellido es obligatorio."));
         messages.add(new Message("user.register.firstSurname.too.short",
-                "El primer apellido debe tener al menos {0} caracteres."));
+                "El primer apellido debe tener al menos 1 caracteres."));
         messages.add(new Message("user.register.firstSurname.too.long",
-                "El primer apellido no puede superar {0} caracteres."));
+                "El primer apellido no puede superar 60 caracteres."));
         messages.add(new Message("user.register.firstSurname.invalidFormat",
                 "El primer apellido solo puede contener letras y espacios."));
 
         // --- secondSurname (opcional) ---
         messages.add(new Message("user.register.secondSurname.too.short",
-                "El segundo apellido debe tener al menos {0} caracteres."));
+                "El segundo apellido debe tener al menos 1 caracteres."));
         messages.add(new Message("user.register.secondSurname.too.long",
-                "El segundo apellido no puede superar {0} caracteres."));
+                "El segundo apellido no puede superar 60 caracteres."));
         messages.add(new Message("user.register.secondSurname.invalidFormat",
                 "El segundo apellido solo puede contener letras y espacios."));
 
@@ -99,9 +99,9 @@ final class MessageCatalogDefaults {
         messages.add(new Message("user.register.email.required",
                 "El correo es obligatorio."));
         messages.add(new Message("user.register.email.too.short",
-                "El correo debe tener al menos {0} caracteres."));
+                "El correo debe tener al menos 5 caracteres."));
         messages.add(new Message("user.register.email.too.long",
-                "El correo no puede superar {0} caracteres."));
+                "El correo no puede superar 120 caracteres."));
         messages.add(new Message("user.register.email.invalid",
                 "El correo no tiene un formato válido."));
 
@@ -109,9 +109,9 @@ final class MessageCatalogDefaults {
         messages.add(new Message("user.register.mobile.required",
                 "El número de celular es obligatorio."));
         messages.add(new Message("user.register.mobile.too.short",
-                "El número de celular debe tener al menos {0} dígitos."));
+                "El número de celular debe tener al menos 7 dígitos."));
         messages.add(new Message("user.register.mobile.too.long",
-                "El número de celular no puede superar {0} dígitos."));
+                "El número de celular no puede superar 15 dígitos."));
         messages.add(new Message("user.register.mobile.invalid",
                 "El número de celular debe contener únicamente dígitos (0–9), sin espacios ni símbolos."));
         messages.add(new Message("user.register.mobile.duplicate",
