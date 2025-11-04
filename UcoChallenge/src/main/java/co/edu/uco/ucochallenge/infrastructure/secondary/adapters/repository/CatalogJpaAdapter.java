@@ -6,15 +6,15 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import co.edu.uco.ucochallenge.application.catalog.port.out.CatalogGateway;
-import co.edu.uco.ucochallenge.application.catalog.usecase.domain.CatalogItemDomain;
-import co.edu.uco.ucochallenge.application.catalog.usecase.domain.CityDomain;
-import co.edu.uco.ucochallenge.application.catalog.usecase.domain.StateDomain;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.CatalogGateway;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.CatalogItemDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.CityDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.StateDomain;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.CityEntity;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.CountryEntity;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.IdTypeEntity;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.StateEntity;
-import co.edu.uco.ucochallenge.application.catalog.messages.CatalogMessageCode;
+import co.edu.uco.ucochallenge.user.registeruser.application.messages.CatalogMessageCode;
 import co.edu.uco.ucochallenge.crosscuting.exception.UcoChallengeBusinessException;
 
 @Component

@@ -18,14 +18,23 @@ public class ParameterController {
     }
 
     // Obtener todos los parámetros
-    @GetMapping
+    // ✅ GET ALL: SOLO cuando NO viene ?key
+    @GetMapping(params = "!key")
     public ResponseEntity<Map<String, Parameter>> getAllParameters() {
-    	return ResponseEntity.ok(catalog.getAll());
+        return ResponseEntity.ok(catalog.getAll());
     }
 
-    // Obtener un parámetro por su clave
+    // ✅ GET ONE POR PATH
     @GetMapping("/{key}")
     public ResponseEntity<Parameter> getParameterByKey(@PathVariable String key) {
+        return catalog.get(key)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // ✅ GET ONE POR QUERY (?key=...)
+    @GetMapping(params = "key")
+    public ResponseEntity<Parameter> getParameterByQuery(@RequestParam String key) {
         return catalog.get(key)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -49,4 +58,6 @@ public class ParameterController {
         }
         return ResponseEntity.notFound().build();
     }
+
+
 }

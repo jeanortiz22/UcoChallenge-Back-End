@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.UserEntity;
-import co.edu.uco.ucochallenge.user.listusers.application.port.out.ListUsersGateway;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.ListUsersGateway;
 import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.ListUsersQueryDomain;
 import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.UserSummaryDomain;
 import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.UserSummaryPageDomain;

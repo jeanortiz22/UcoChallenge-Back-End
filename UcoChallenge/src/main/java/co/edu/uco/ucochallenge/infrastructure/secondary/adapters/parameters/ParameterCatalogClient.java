@@ -35,7 +35,10 @@ public class ParameterCatalogClient implements ParameterCatalogPort {
             log.debug("Consultando parámetro. code={}, args={}", code, Arrays.toString(args));
 
             var dto = parametersWebClient.get()
-                    .uri("/{key}", code)
+                    .uri(uriBuilder -> uriBuilder
+                            // Llama: GET {base-url}?key={code}
+                            .queryParam("key", code)
+                            .build())
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, response ->
                             response.bodyToMono(String.class).defaultIfEmpty("")
@@ -51,6 +54,7 @@ public class ParameterCatalogClient implements ParameterCatalogPort {
                     )
                     .bodyToMono(ParameterDto.class)
                     .block();
+
 
             if (dto == null) {
                 log.warn("DTO nulo desde catálogo de parámetros para code={}", code);

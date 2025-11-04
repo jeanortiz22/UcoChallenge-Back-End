@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.uco.ucochallenge.application.catalog.interactor.CatalogInteractor;
-import co.edu.uco.ucochallenge.application.catalog.interactor.dto.CatalogItemDTO;
-import co.edu.uco.ucochallenge.application.catalog.interactor.dto.CityDTO;
-import co.edu.uco.ucochallenge.application.catalog.interactor.dto.StateDTO;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.CatalogInteractor;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.CatalogItemDTO;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.CityDTO;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.StateDTO;
 
 @RestController
 @RequestMapping("/api/v1/catalogo")

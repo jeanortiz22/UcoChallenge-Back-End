@@ -11,11 +11,11 @@ import co.edu.uco.ucochallenge.user.confirmation.application.domain.SendConfirma
 import co.edu.uco.ucochallenge.user.confirmation.application.domain.UserConfirmationDomain;
 import co.edu.uco.ucochallenge.user.confirmation.application.domain.UserConfirmationResultDomain;
 import co.edu.uco.ucochallenge.user.confirmation.application.messages.UserConfirmationMessageCode;
-import co.edu.uco.ucochallenge.user.confirmation.application.port.out.UserConfirmationGateway;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.UserConfirmationGateway;
 import co.edu.uco.ucochallenge.user.confirmation.application.usecase.SendConfirmationCodeUseCase;
 import co.edu.uco.ucochallenge.user.confirmation.application.service.ConfirmationNotificationService;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.ConfirmationTokens;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.service.ConfirmationTokenService;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.ConfirmationTokens;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.service.ConfirmationTokenService;
 
 @Service
 public class SendConfirmationCodeUseCaseImpl implements SendConfirmationCodeUseCase {

@@ -16,7 +16,7 @@ import co.edu.uco.ucochallenge.user.confirmation.application.domain.UserConfirma
 import co.edu.uco.ucochallenge.user.confirmation.application.domain.UserConfirmationResultDomain;
 import co.edu.uco.ucochallenge.user.confirmation.application.domain.VerifyConfirmationCodeInputDomain;
 import co.edu.uco.ucochallenge.user.confirmation.application.messages.UserConfirmationMessageCode;
-import co.edu.uco.ucochallenge.user.confirmation.application.port.out.UserConfirmationGateway;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.UserConfirmationGateway;
 import co.edu.uco.ucochallenge.user.confirmation.application.usecase.VerifyConfirmationCodeUseCase;
 
 @Service

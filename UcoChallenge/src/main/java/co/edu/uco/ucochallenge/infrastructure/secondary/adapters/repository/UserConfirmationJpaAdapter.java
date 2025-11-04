@@ -11,7 +11,7 @@ import co.edu.uco.ucochallenge.crosscuting.helper.UUIDHelper;
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.UserEntity;
 import co.edu.uco.ucochallenge.user.confirmation.application.domain.UserConfirmationDomain;
 import co.edu.uco.ucochallenge.user.confirmation.application.messages.UserConfirmationMessageCode;
-import co.edu.uco.ucochallenge.user.confirmation.application.port.out.UserConfirmationGateway;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.UserConfirmationGateway;
 
 @Component
 public class UserConfirmationJpaAdapter implements UserConfirmationGateway {

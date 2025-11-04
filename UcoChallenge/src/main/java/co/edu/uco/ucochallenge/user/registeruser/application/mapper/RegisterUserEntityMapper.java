@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Builder;
 
 import co.edu.uco.ucochallenge.infrastructure.secondary.adapters.repository.entity.UserEntity;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.RegisterUserDomain;
 
 @Mapper(
     componentModel = "spring",

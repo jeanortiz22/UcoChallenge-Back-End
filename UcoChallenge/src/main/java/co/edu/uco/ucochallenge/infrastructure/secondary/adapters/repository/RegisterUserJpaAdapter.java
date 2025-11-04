@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import co.edu.uco.ucochallenge.user.registeruser.application.port.out.RegisterUserGateway;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.ExistingUserInformation;
-import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.RegisterUserGateway;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.ExistingUserInformation;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.domain.RegisterUserDomain;
 import co.edu.uco.ucochallenge.crosscuting.helper.UUIDHelper;
 import co.edu.uco.ucochallenge.user.registeruser.application.mapper.RegisterUserEntityMapper;
 @Component

@@ -4,7 +4,7 @@ package co.edu.uco.ucochallenge.user.listusers.application.interactor.usecase.im
 import org.springframework.stereotype.Service;
 
 import co.edu.uco.ucochallenge.user.listusers.application.interactor.usecase.ListUsersUseCase;
-import co.edu.uco.ucochallenge.user.listusers.application.port.out.ListUsersGateway;
+import co.edu.uco.ucochallenge.infrastructure.secondary.ports.repository.ListUsersGateway;
 import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.ListUsersQueryDomain;
 import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.UserSummaryPageDomain;
 

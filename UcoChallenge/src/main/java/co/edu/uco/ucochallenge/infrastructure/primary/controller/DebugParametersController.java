@@ -53,4 +53,23 @@ public class DebugParametersController {
         String value = parameterCatalog.get(key, arg1, arg2);
         return ResponseEntity.ok(value);
     }
+    // ✅ Ping directo al catálogo (bypassa caché del adapter)
+    @GetMapping("/_ping")
+    public ResponseEntity<String> ping() {
+        try {
+            var res = parametersWebClient.get()
+                    .exchangeToMono(r ->
+                            r.bodyToMono(String.class)
+                                    .defaultIfEmpty("")
+                                    .map(b -> "STATUS=" + r.statusCode().value() + "\nBODY=" + b))
+                    .block();
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("PING ERROR: " + e.getMessage());
+        }
+    }
+
+
+
+
 }
