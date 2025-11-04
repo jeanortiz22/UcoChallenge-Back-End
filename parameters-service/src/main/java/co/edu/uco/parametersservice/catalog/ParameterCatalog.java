@@ -17,15 +17,22 @@ import co.edu.uco.parametersservice.catalog.persistence.ParameterDocumentReposit
 @Service
 @Transactional(readOnly = true)
 public class ParameterCatalog {
-	
-	private static final Logger log = LoggerFactory.getLogger(ParameterCatalog.class);
+
+    private static final Logger log = LoggerFactory.getLogger(ParameterCatalog.class);
     private final ParameterDocumentRepository repository;
 
     public ParameterCatalog(ParameterDocumentRepository repository) {
         this.repository = repository;
     }
 
-    @Cacheable(cacheNames = "parametersAll")
+    /**
+     * Obtener todos los parámetros almacenados.
+     * Se cachea el mapa completo para lecturas masivas.
+     */
+    @Cacheable(
+            cacheNames = "parametersAll",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public Map<String, Parameter> getAll() {
         Map<String, Parameter> parameters = new LinkedHashMap<>();
         repository.findAll().forEach(document -> {
@@ -37,7 +44,15 @@ public class ParameterCatalog {
         return parameters;
     }
 
-    @Cacheable(cacheNames = "parameters", key = "#key", unless = "#result.isEmpty()")
+    /**
+     * Obtener un parámetro por clave.
+     * Se almacena en caché individual bajo su clave normalizada.
+     */
+    @Cacheable(
+            cacheNames = "parameters",
+            key = "#key != null ? #key.trim() : null",
+            unless = "#result == null || (#result instanceof T(java.util.Optional) && !#result.isPresent())"
+    )
     public Optional<Parameter> get(String key) {
         if (key == null || key.isBlank()) {
             return Optional.empty();
@@ -45,6 +60,10 @@ public class ParameterCatalog {
         return repository.findById(normalize(key)).map(ParameterMapper::toDomain);
     }
 
+    /**
+     * Crear o actualizar un parámetro.
+     * Se invalida tanto la caché individual como la caché total.
+     */
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "parameters", key = "#parameter.key"),
@@ -58,6 +77,10 @@ public class ParameterCatalog {
         repository.save(ParameterMapper.toDocument(parameter));
     }
 
+    /**
+     * Eliminar un parámetro por clave.
+     * También invalida ambas cachés.
+     */
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "parameters", key = "#key"),
@@ -79,5 +102,4 @@ public class ParameterCatalog {
     private String normalize(String key) {
         return key == null ? null : key.trim();
     }
-
 }

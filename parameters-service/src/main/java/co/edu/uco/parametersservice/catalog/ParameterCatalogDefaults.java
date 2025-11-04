@@ -30,19 +30,19 @@ final class ParameterCatalogDefaults {
         // --- Nombres y Apellidos ---
         // firstName: 1..50
         parameters.add(new Parameter("user.register.firstName.min", "1"));
-        parameters.add(new Parameter("user.register.firstName.max", "50"));
+        parameters.add(new Parameter("user.register.firstName.max", "60"));
 
         // secondName (opcional): 0..50 (0 permite omitir)
         parameters.add(new Parameter("user.register.secondName.min", "0"));
-        parameters.add(new Parameter("user.register.secondName.max", "50"));
+        parameters.add(new Parameter("user.register.secondName.max", "60"));
 
-        // firstSurname: 2..50
-        parameters.add(new Parameter("user.register.firstSurname.min", "2"));
-        parameters.add(new Parameter("user.register.firstSurname.max", "50"));
+        // firstSurname: 1..50
+        parameters.add(new Parameter("user.register.firstSurname.min", "1"));
+        parameters.add(new Parameter("user.register.firstSurname.max", "60"));
 
-        // secondSurname (opcional): 0..50
+        // secondSurname (opcional): 0..60
         parameters.add(new Parameter("user.register.secondSurname.min", "0"));
-        parameters.add(new Parameter("user.register.secondSurname.max", "50"));
+        parameters.add(new Parameter("user.register.secondSurname.max", "60"));
 
         // --- Email ---
         // Rango por defecto: 5..120
@@ -52,8 +52,8 @@ final class ParameterCatalogDefaults {
         parameters.add(new Parameter("user.register.email.pattern", "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"));
 
         // --- Móvil ---
-        // Rango por defecto: 10..15 (solo dígitos)
-        parameters.add(new Parameter("user.register.mobile.min", "10"));
+        // Rango por defecto: 7..15 (solo dígitos)
+        parameters.add(new Parameter("user.register.mobile.min", "7"));
         parameters.add(new Parameter("user.register.mobile.max", "15"));
         parameters.add(new Parameter("user.register.mobile.pattern", "^[0-9]+$"));
 
@@ -63,7 +63,7 @@ final class ParameterCatalogDefaults {
 
         // --- Políticas de seguridad ---
         // TTLs en minutos
-        parameters.add(new Parameter("user.register.emailToken.ttlMin", "30"));
+        parameters.add(new Parameter("user.register.firstSurname.min", "30"));
         parameters.add(new Parameter("user.register.smsToken.ttlMin", "10"));
         parameters.add(new Parameter("user.register.maxRetries", "5"));
 

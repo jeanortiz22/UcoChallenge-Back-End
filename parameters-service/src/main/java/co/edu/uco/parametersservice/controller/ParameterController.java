@@ -10,54 +10,40 @@ import java.util.Map;
 @RestController
 @RequestMapping("/parameters/api/v1/parameters")
 public class ParameterController {
-	
-	private final ParameterCatalog catalog;
+
+    private final ParameterCatalog catalog;
 
     public ParameterController(ParameterCatalog catalog) {
         this.catalog = catalog;
     }
 
-    // Obtener todos los parámetros
-    // ✅ GET ALL: SOLO cuando NO viene ?key
-    @GetMapping(params = "!key")
+    @GetMapping
     public ResponseEntity<Map<String, Parameter>> getAllParameters() {
         return ResponseEntity.ok(catalog.getAll());
     }
 
-    // ✅ GET ONE POR PATH
-    @GetMapping("/{key}")
+    // 🔧 Aceptar puntos en la key
+    @GetMapping("/{key:.+}")
     public ResponseEntity<Parameter> getParameterByKey(@PathVariable String key) {
         return catalog.get(key)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ✅ GET ONE POR QUERY (?key=...)
-    @GetMapping(params = "key")
-    public ResponseEntity<Parameter> getParameterByQuery(@RequestParam String key) {
-        return catalog.get(key)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    // Actualizar o agregar un parámetro
-    @PutMapping("/{key}")
+    @PutMapping("/{key:.+}")
     public ResponseEntity<Void> synchronizeParameter(@PathVariable String key, @RequestBody Parameter parameter) {
-    	if (parameter == null || parameter.getKey() == null || !key.equals(parameter.getKey())) {
+        if (parameter == null || parameter.getKey() == null || !key.equals(parameter.getKey())) {
             return ResponseEntity.badRequest().build();
         }
-    	catalog.upsert(parameter);
+        catalog.upsert(parameter);
         return ResponseEntity.noContent().build();
     }
 
-    // Eliminar un parámetro
-    @DeleteMapping("/{key}")
+    @DeleteMapping("/{key:.+}")
     public ResponseEntity<Void> deleteParameter(@PathVariable String key) {
-    	if (catalog.remove(key)) {
+        if (catalog.remove(key)) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
     }
-
-
 }

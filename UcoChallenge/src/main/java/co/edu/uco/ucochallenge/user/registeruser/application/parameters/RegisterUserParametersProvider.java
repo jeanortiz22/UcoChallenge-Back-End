@@ -33,7 +33,7 @@ public class RegisterUserParametersProvider {
         int emailMax = num(RegisterUserParameterCode.EMAIL_MAX, 120, 5, 300);
         String emailRx = str(RegisterUserParameterCode.EMAIL_PATTERN, "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
-        int mobileMin = num(RegisterUserParameterCode.MOBILE_MIN, 10, 0, 50);
+        int mobileMin = num(RegisterUserParameterCode.MOBILE_MIN, 7, 0, 50);
         int mobileMax = num(RegisterUserParameterCode.MOBILE_MAX, 15, 0, 50);
         String mobileRx = str(RegisterUserParameterCode.MOBILE_PATTERN, "^[0-9]+$");
 

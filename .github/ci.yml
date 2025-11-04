@@ -1,0 +1,248 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: '21'
+
+jobs:
+  build-test:
+    name: Build & Test (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - UcoChallenge
+          - UcoChallengeGateway
+          - messages-service
+          - notifications-service
+          - parameters-service
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Build and run tests
+        run: |
+          mvn -B -pl ${{ matrix.module }} -am \
+            clean org.jacoco:jacoco-maven-plugin:prepare-agent verify
+
+      - name: Generate coverage report
+        run: |
+          mvn -B -pl ${{ matrix.module }} -am -DskipTests \
+            org.jacoco:jacoco-maven-plugin:report
+
+      - name: SpotBugs static analysis
+        run: |
+          mvn -B -pl ${{ matrix.module }} -am -DskipTests \
+            -Dspotbugs.failOnError=true \
+            -Dspotbugs.effort=Max \
+            -Dspotbugs.threshold=Low \
+            -Dspotbugs.xmlOutput=true \
+            -Dspotbugs.htmlOutput=true \
+            com.github.spotbugs:spotbugs-maven-plugin:4.8.6.6:spotbugs
+
+      - name: OWASP Dependency Check
+        run: |
+          mvn -B -pl ${{ matrix.module }} -am -DskipTests \
+            -Dformat=HTML \
+            -DfailOnError=true \
+            org.owasp:dependency-check-maven:9.2.0:check
+
+      - name: Archive unit test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-${{ matrix.module }}
+          path: ${{ matrix.module }}/target/surefire-reports
+          if-no-files-found: warn
+
+      - name: Archive coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.module }}
+          path: ${{ matrix.module }}/target/site/jacoco
+          if-no-files-found: warn
+
+      - name: Archive SpotBugs report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-${{ matrix.module }}
+          path: |
+            ${{ matrix.module }}/target/spotbugsXml.xml
+            ${{ matrix.module }}/target/site/spotbugs.html
+          if-no-files-found: warn
+
+      - name: Archive Dependency Check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-${{ matrix.module }}
+          path: ${{ matrix.module }}/target/dependency-check-report.html
+          if-no-files-found: warn
+
+  trivy-scan:
+    name: Trivy Scan (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    needs: build-test
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - UcoChallenge
+          - UcoChallengeGateway
+          - messages-service
+          - notifications-service
+          - parameters-service
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Build container image
+        id: build-image
+        env:
+          MODULE: ${{ matrix.module }}
+          SHA: ${{ github.sha }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          OWNER_LC=$(echo "${OWNER}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_BASENAME="ghcr.io/${OWNER_LC}/ucochallenge-${MODULE}"
+          IMAGE_NAME="${IMAGE_BASENAME}:${SHA}"
+          mvn -B -pl "${MODULE}" -am -DskipTests \
+            -Dspring-boot.build-image.imageName="${IMAGE_NAME}" \
+            spring-boot:build-image
+          echo "image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "basename=${IMAGE_BASENAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Scan image with Trivy
+        id: trivy
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ steps.build-image.outputs.image }}
+          severity: HIGH,CRITICAL
+          format: sarif
+          output: trivy-${{ matrix.module }}.sarif
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Upload Trivy SARIF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-${{ matrix.module }}
+          path: trivy-${{ matrix.module }}.sarif
+
+      - name: Publish Trivy report to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-${{ matrix.module }}.sarif
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs:
+      - build-test
+      - trivy-scan
+    if: ${{ always() }}
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+    steps:
+      - name: Evaluate quality checks
+        env:
+          BUILD_TEST_RESULT: ${{ needs.build-test.result }}
+          TRIVY_RESULT: ${{ needs.trivy-scan.result }}
+        run: |
+          echo "Build & Test result: ${BUILD_TEST_RESULT}"
+          echo "Trivy Scan result: ${TRIVY_RESULT}"
+          if [ "${BUILD_TEST_RESULT}" != "success" ]; then
+            echo "Build and test stage did not complete successfully"
+            exit 1
+          fi
+          if [ "${TRIVY_RESULT}" != "success" ]; then
+            echo "Security scan stage did not complete successfully"
+            exit 1
+          fi
+
+      - name: Set gate output
+        id: gate
+        run: echo "ready=true" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Publish Container Images
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    if: ${{ needs.quality-gate.result == 'success' && needs.quality-gate.outputs.ready == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - UcoChallenge
+          - UcoChallengeGateway
+          - messages-service
+          - notifications-service
+          - parameters-service
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container images
+        env:
+          MODULE: ${{ matrix.module }}
+          SHA: ${{ github.sha }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          OWNER_LC=$(echo "${OWNER}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_BASENAME="ghcr.io/${OWNER_LC}/ucochallenge-${MODULE}"
+          IMAGE_SHA="${IMAGE_BASENAME}:${SHA}"
+          IMAGE_LATEST="${IMAGE_BASENAME}:latest"
+          mvn -B -pl "${MODULE}" -am -DskipTests \
+            -Dspring-boot.build-image.imageName="${IMAGE_SHA}" \
+            spring-boot:build-image
+          docker tag "${IMAGE_SHA}" "${IMAGE_LATEST}"
+          docker push "${IMAGE_SHA}"
+          docker push "${IMAGE_LATEST}"
+
+      - name: Publish image coordinates
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "Image published: ghcr.io/${OWNER_LC}/ucochallenge-${{ matrix.module }}:${{ github.sha }}"
+          echo "Latest tag: ghcr.io/${OWNER_LC}/ucochallenge-${{ matrix.module }}:latest"
