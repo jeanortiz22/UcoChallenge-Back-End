@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 public class WebClientConfig {
 
     private static final Logger log = LoggerFactory.getLogger(WebClientConfig.class);
+    
+    @Bean
+    public ReactorNettyClientTracer reactorNettyClientTracer() {
+        return new ReactorNettyClientTracer();
+    }
 
     /**
      * 🧱 Método helper que construye un HttpClient reutilizable con timeouts
@@ -47,7 +52,8 @@ public class WebClientConfig {
             @Value("${messages.catalog.base-url}") String baseUrl,
             @Value("${gateway.security.header}") String gatewayHeaderName,
             @Value("${gateway.security.secret}") String gatewayHeaderValue,
-            WebClient.Builder builder
+            WebClient.Builder builder,
+            ReactorNettyClientTracer reactorNettyClientTracer
     ) {
         log.info("### MessageCatalog baseUrl = {}", baseUrl);
 
@@ -76,11 +82,13 @@ public class WebClientConfig {
             WebClient.Builder builder,
             @Value("${parameters.catalog.base-url}") String baseUrl,
             @Value("${gateway.security.header}") String gatewayHeaderName,
-            @Value("${gateway.security.secret}") String gatewayHeaderValue
+            @Value("${gateway.security.secret}") String gatewayHeaderValue,
+            ReactorNettyClientTracer reactorNettyClientTracer
     ) {
         log.info("### ParameterCatalog baseUrl = {}", baseUrl);
 
         return builder
+        		.apply(reactorNettyClientTracer)
                 .baseUrl(baseUrl)
                 .defaultHeader(gatewayHeaderName, gatewayHeaderValue)
                 .exchangeStrategies(ExchangeStrategies.builder()
@@ -100,10 +108,12 @@ public class WebClientConfig {
             WebClient.Builder builder,
             @Value("${notifications.api.base-url}") String baseUrl,
             @Value("${gateway.security.header}") String headerName,
-            @Value("${gateway.security.secret}") String secret
+            @Value("${gateway.security.secret}") String secret,
+            ReactorNettyClientTracer reactorNettyClientTracer
     ) {
         log.info("### NotificationsAPI baseUrl = {}", baseUrl);
         return builder
+        		.apply(reactorNettyClientTracer)
                 .baseUrl(baseUrl)
                 .defaultHeader(headerName, secret)
                 .exchangeStrategies(ExchangeStrategies.builder()

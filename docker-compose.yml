@@ -8,11 +8,13 @@ services:
       - DD_APM_ENABLED=true
       - DD_APM_NON_LOCAL_TRAFFIC=true
       - DD_PROFILING_ENABLED=true
-      - DD_LOGS_ENABLED=false            # ← desactiva recolección de logs de contenedores por ahora
+      - DD_LOGS_ENABLED=false        # ← desactiva recolección de logs de contenedores por ahora
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT=0.0.0.0:4318
     ports:
       - "8126:8126/tcp"   # APM (traces)
       - "8125:8125/udp"   # DogStatsD (metrics)
+      - "4318:4318/tcp"   # OTLP HTTP (traces and metrics)
     # Montajes útiles; no son obligatorios, pero ayudan en healthchecks/metrics
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
