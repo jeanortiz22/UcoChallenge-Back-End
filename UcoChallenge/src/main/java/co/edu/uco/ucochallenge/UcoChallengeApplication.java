@@ -8,8 +8,14 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class UcoChallengeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(UcoChallengeApplication.class, args);
-	}
+	static {
+        if (System.getProperty("otel.java.global-autoconfigure.enabled") == null) {
+            System.setProperty("otel.java.global-autoconfigure.enabled", "true");
+        }
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(UcoChallengeApplication.class, args);
+    }
 
 }

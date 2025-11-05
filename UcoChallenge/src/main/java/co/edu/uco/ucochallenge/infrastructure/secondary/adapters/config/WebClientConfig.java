@@ -58,6 +58,7 @@ public class WebClientConfig {
         log.info("### MessageCatalog baseUrl = {}", baseUrl);
 
         return builder
+                .apply(reactorNettyClientTracer)
                 .baseUrl(baseUrl)
                 .defaultHeader(gatewayHeaderName, gatewayHeaderValue)
                 .exchangeStrategies(ExchangeStrategies.builder()
