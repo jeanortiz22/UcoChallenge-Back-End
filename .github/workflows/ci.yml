@@ -52,6 +52,75 @@ jobs:
           mvn -B -pl ${{ matrix.module }} -am -DskipTests \
             org.jacoco:jacoco-maven-plugin:report
 
+          cache: maven
+
+      - name: Build and run tests
+        run: |
+          mvn -B -pl ${{ matrix.module }} -am \
+            clean org.jacoco:jacoco-maven-plugin:prepare-agent verify
+
+      - name: Generate coverage report
+        run: |
+          mvn -B -pl ${{ matrix.module }} -am -DskipTests \
+            org.jacoco:jacoco-maven-plugin:report
+
+      - name: Summarize Jacoco coverage
+        id: coverage-summary
+        env:
+          REPORT_PATH: ${{ matrix.module }}/target/site/jacoco/jacoco.csv
+          MODULE_NAME: ${{ matrix.module }}
+          COVERAGE_THRESHOLD: "80"
+        run: |
+          python <<'PY'
+          import csv
+          import os
+          import pathlib
+          import sys
+
+          report_path = pathlib.Path(os.environ["REPORT_PATH"])
+          if not report_path.exists():
+              print(f"::error::Coverage report not found: {report_path}", file=sys.stderr)
+              sys.exit(1)
+
+          with report_path.open(encoding="utf-8") as report_file:
+              reader = csv.DictReader(report_file)
+              bundle = next(reader, None)
+
+          if bundle is None:
+              print("::error::Coverage report is empty", file=sys.stderr)
+              sys.exit(1)
+
+          def ratio(covered_key: str, missed_key: str) -> float:
+              covered = int(bundle[covered_key])
+              missed = int(bundle[missed_key])
+              total = covered + missed
+              return (covered / total * 100.0) if total else 0.0
+
+          line_ratio = ratio("LINE_COVERED", "LINE_MISSED")
+          branch_ratio = ratio("BRANCH_COVERED", "BRANCH_MISSED")
+
+          print(f"Line coverage: {line_ratio:.2f}%")
+          print(f"Branch coverage: {branch_ratio:.2f}%")
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary_path:
+              summary = pathlib.Path(summary_path)
+              with summary.open("a", encoding="utf-8") as summary_file:
+                  summary_file.write(f"### Coverage summary for {os.environ['MODULE_NAME']}\n")
+                  summary_file.write(f"* Line coverage: {line_ratio:.2f}%\n")
+                  summary_file.write(f"* Branch coverage: {branch_ratio:.2f}%\n\n")
+
+          threshold = float(os.environ.get("COVERAGE_THRESHOLD", "80"))
+          if line_ratio < threshold or branch_ratio < threshold:
+              print(
+                  f"::error::Coverage below threshold {threshold:.0f}% "
+                  f"(line: {line_ratio:.2f}%, branch: {branch_ratio:.2f}%)",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          PY
+      
+
       - name: SpotBugs static analysis
         run: |
           mvn -B -pl ${{ matrix.module }} -am -DskipTests \

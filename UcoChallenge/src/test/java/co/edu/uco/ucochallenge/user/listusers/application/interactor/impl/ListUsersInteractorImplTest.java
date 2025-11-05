@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import co.edu.uco.ucochallenge.user.listusers.application.interactor.dto.ListUsersRequestDTO;
 import co.edu.uco.ucochallenge.user.listusers.application.interactor.dto.PagedUsersResponseDTO;
 import co.edu.uco.ucochallenge.user.listusers.application.interactor.usecase.ListUsersUseCase;
 import co.edu.uco.ucochallenge.user.listusers.application.usecase.domain.ListUsersQueryDomain;
@@ -87,5 +90,47 @@ class ListUsersInteractorImplTest {
         assertEquals(0, capturedQuery.getPage());
         assertEquals(20, capturedQuery.getSize());
         assertFalse(response.users().isEmpty());
+    }
+
+    @Test
+    void execute_whenRequestHasValues_shouldClampAndFilterNullUsers() {
+        final var userId = UUID.randomUUID();
+        final var idType = UUID.randomUUID();
+        final var homeCity = UUID.randomUUID();
+        final var domainUser = UserSummaryDomain.create(
+                userId,
+                idType,
+                "CC456",
+                "Carlos",
+                "",
+                "Ramirez",
+                "",
+                homeCity,
+                "carlos@example.com",
+                "3007654321",
+                false,
+                true);
+
+        final var pageDomain = UserSummaryPageDomain.create(
+                Arrays.asList(domainUser, null),
+                0,
+                100,
+                1L,
+                1);
+
+        when(useCase.execute(any(ListUsersQueryDomain.class))).thenReturn(pageDomain);
+
+        final PagedUsersResponseDTO response = interactor.execute(new ListUsersRequestDTO(-5, 500));
+
+        final ArgumentCaptor<ListUsersQueryDomain> queryCaptor = ArgumentCaptor.forClass(ListUsersQueryDomain.class);
+        verify(useCase).execute(queryCaptor.capture());
+        final ListUsersQueryDomain capturedQuery = queryCaptor.getValue();
+
+        assertEquals(0, capturedQuery.getPage());
+        assertEquals(100, capturedQuery.getSize());
+        assertEquals(1, response.users().size());
+        assertEquals(domainUser.getId(), response.users().get(0).id());
+        assertEquals(pageDomain.getTotalElements(), response.totalElements());
+        assertEquals(pageDomain.getTotalPages(), response.totalPages());
     }
 }
