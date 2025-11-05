@@ -48,41 +48,29 @@ Todos los prompts deben almacenarse en `ai-artifacts/` usando la plantilla corre
 - Cualquier información sensible debe anonimizarse antes de ser utilizada en prompts.
 - Las auditorías semestrales verificarán la existencia de artefactos y la trazabilidad de decisiones.
 
-Para más detalles operativos, consulta las plantillas en `ai-artifacts/` y el plan de capacitación en `docs/ai/enablement-plan.md`.#!/usr/bin/env bash
-set -euo pipefail
+Para más detalles operativos, consulta las plantillas en `ai-artifacts/` y el plan de capacitación en `docs/ai/enablement-plan.md`.
 
-ARTIFACT_DIR="ai-artifacts"
+## 7. ¿Cómo ensayar el flujo AI-First?
 
-if [[ ! -d "${ARTIFACT_DIR}" ]]; then
-echo "[AI Artifacts] No se encontró el directorio '${ARTIFACT_DIR}'." >&2
-exit 1
-fi
+Sigue estos pasos cada vez que quieras comprobar que la práctica funciona de punta a punta antes de enviar una PR:
 
-shopt -s nullglob
-files=("${ARTIFACT_DIR}"/*.md "${ARTIFACT_DIR}"/*.txt)
-shopt -u nullglob
+1. **Prepara los artefactos:** copia las plantillas desde `ai-artifacts/` y complétalas con la sesión que quieras validar. Asegúrate de mantener la marca `AI Artifact` en el encabezado.
+2. **Ejecuta la verificación local:** desde la raíz del repositorio corre `./scripts/check-ai-artifacts.sh`. El script saldrá con código `0` cuando detecte al menos un artefacto válido y mostrará la lista de archivos evaluados.
+   ```bash
+   ./scripts/check-ai-artifacts.sh
+   # [AI Artifacts] Se encontraron artefactos AI válidos:
+   #  - ai-artifacts/prompt-template.md
+   #  - ai-artifacts/session-report-template.md
+   ```
+3. **Revisa la salida:** si el script falla, revisa que los archivos no estén vacíos y que conserven la marca `AI Artifact`. Corrige y vuelve a ejecutar hasta ver el mensaje _"[AI Artifacts] Se encontraron artefactos AI válidos"_.
+4. **Integra con otras pruebas:** ejecuta las pruebas unitarias o de servicio habituales del módulo que estás modificando para complementar la verificación de artefactos.
+5. **Adjunta la evidencia en la PR:** enlaza los artefactos y pega el resultado del script (o de la ejecución en CI) en la sección de evidencia AI-First de la plantilla de PR.
 
-if [[ ${#files[@]} -eq 0 ]]; then
-echo "[AI Artifacts] No se encontraron archivos .md o .txt en '${ARTIFACT_DIR}'." >&2
-exit 1
-fi
+Estos pasos replican exactamente lo que valida el flujo de CI (`scripts/check-ai-artifacts.sh`), de modo que si pasan localmente también pasarán en el pipeline.
 
-missing_marker=()
-for file in "${files[@]}"; do
-if [[ ! -s "${file}" ]]; then
-echo "[AI Artifacts] El archivo '${file}' está vacío." >&2
-exit 1
-fi
-if ! grep -qi "AI Artifact" "${file}"; then
-missing_marker+=("${file}")
-fi
-done
+### ¿Cómo verificarlo en GitHub Actions?
 
-if [[ ${#missing_marker[@]} -eq 0 ]]; then
-echo "[AI Artifacts] Se encontraron artefactos AI válidos:"
-printf ' - %s\n' "${files[@]}"
-exit 0
-fi
-
-echo "[AI Artifacts] Los siguientes archivos no indican ser artefactos AI: ${missing_marker[*]}" >&2
-exit 1
+1. Abre la pestaña **Actions** del repositorio y selecciona el workflow **CI** más reciente.
+2. Dentro del job correspondiente a tu módulo (por ejemplo, `Build & Test (messages-service)`), localiza el paso **Validar artefactos AI**.
+3. Haz clic en el paso para ver el log. Deberías observar la misma salida que cuando lo ejecutas localmente. Si aparece un error, revisa los artefactos listados y corrige los archivos marcados.
+4. Una vez que el paso se muestre en verde, el flujo de Vibe Coding se considera validado para esa ejecución.

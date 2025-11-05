@@ -32,9 +32,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validar artefactos AI
-        run: |
-          chmod +x scripts/check-ai-artifacts.sh
-          bash scripts/check-ai-artifacts.sh
+        run: ./scripts/check-ai-artifacts.sh
+
 
       - name: Set up Temurin JDK
         uses: actions/setup-java@v4
@@ -122,9 +121,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validar artefactos AI
-        run: |
-          chmod +x scripts/check-ai-artifacts.sh
-          bash scripts/check-ai-artifacts.sh
+        run: ./scripts/check-ai-artifacts.sh
+
 
       - name: Set up Temurin JDK
         uses: actions/setup-java@v4
