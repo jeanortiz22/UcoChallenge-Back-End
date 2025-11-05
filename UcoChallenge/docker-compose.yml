@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  ucochallenge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m -Dfile.encoding=UTF-8"
+    ports:
+      - "8080:8080"

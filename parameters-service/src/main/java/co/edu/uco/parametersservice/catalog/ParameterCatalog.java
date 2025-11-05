@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import co.edu.uco.parametersservice.catalog.persistence.ParameterDocumentRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class ParameterCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(ParameterCatalog.class);
@@ -28,7 +29,6 @@ public class ParameterCatalog {
      * Obtener todos los parámetros almacenados.
      * Se cachea el mapa completo para lecturas masivas.
      */
-    @Transactional(readOnly = true)
     @Cacheable(
             cacheNames = "parametersAll",
             unless = "#result == null || #result.isEmpty()"
@@ -48,12 +48,10 @@ public class ParameterCatalog {
      * Obtener un parámetro por clave.
      * Se almacena en caché individual bajo su clave normalizada.
      */
-    @Transactional(readOnly = true)
     @Cacheable(
-        cacheNames = "parameters",
-        key = "#key.trim()",
-        condition = "#key != null && !#key.isBlank()",
-        unless = "#result == null || !#result.isPresent()"
+            cacheNames = "parameters",
+            key = "#key != null ? #key.trim() : null",
+            unless = "#result == null || (#result instanceof T(java.util.Optional) && !#result.isPresent())"
     )
     public Optional<Parameter> get(String key) {
         if (key == null || key.isBlank()) {
@@ -68,14 +66,14 @@ public class ParameterCatalog {
      */
     @Transactional
     @Caching(evict = {
-            @CacheEvict(cacheNames = "parameters", key = "#parameter.key != null ? #parameter.key.trim() : null"),
+            @CacheEvict(cacheNames = "parameters", key = "#parameter.key"),
             @CacheEvict(cacheNames = "parametersAll", allEntries = true)
     })
     public void upsert(Parameter parameter) {
         if (parameter == null) {
-            throw new IllegalArgumentException("El parámetro es obligatorio");
+            throw new IllegalArgumentException("parameter is required");
         }
-        log.debug("Guardando parámetro '{}'", parameter.getKey());
+        log.debug("Guardando parámetro {}", parameter.getKey());
         repository.save(ParameterMapper.toDocument(parameter));
     }
 
@@ -85,7 +83,7 @@ public class ParameterCatalog {
      */
     @Transactional
     @Caching(evict = {
-            @CacheEvict(cacheNames = "parameters", key = "#key != null ? #key.trim() : null"),
+            @CacheEvict(cacheNames = "parameters", key = "#key"),
             @CacheEvict(cacheNames = "parametersAll", allEntries = true)
     })
     public boolean remove(String key) {
@@ -96,7 +94,7 @@ public class ParameterCatalog {
         if (!repository.existsById(normalized)) {
             return false;
         }
-        log.debug("Eliminando parámetro '{}'", normalized);
+        log.debug("Eliminando parámetro {}", normalized);
         repository.deleteById(normalized);
         return true;
     }

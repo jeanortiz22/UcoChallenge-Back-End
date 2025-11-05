@@ -21,7 +21,8 @@ public class CorsConfig {
         CorsConfiguration corsConfig = new CorsConfiguration();
         
         // Origen del frontend
-        corsConfig.setAllowedOrigins(List.of("http://localhost:5173"));
+        corsConfig.setAllowedOrigins(List.of("http://localhost:5173",
+                "https://ucochallenge-front-end.onrender.com"));
         
         // Permitir credenciales (cookies, authorization headers)
         corsConfig.setAllowCredentials(true);

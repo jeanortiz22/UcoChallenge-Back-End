@@ -23,7 +23,7 @@ public class RegisterUserParametersProvider {
         int snMin = num(RegisterUserParameterCode.SECOND_NAME_MIN, 0, 0, 200);
         int snMax = num(RegisterUserParameterCode.SECOND_NAME_MAX, 50, 0, 200);
 
-        int fsMin = num(RegisterUserParameterCode.FIRST_SURNAME_MIN, 2, 1, 200);
+        int fsMin = num(RegisterUserParameterCode.FIRST_SURNAME_MIN, 1, 1, 200);
         int fsMax = num(RegisterUserParameterCode.FIRST_SURNAME_MAX, 50, 2, 200);
 
         int ssMin = num(RegisterUserParameterCode.SECOND_SURNAME_MIN, 0, 0, 200);

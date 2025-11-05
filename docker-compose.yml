@@ -1,23 +1,33 @@
 services:
   datadog-agent:
-    image: gcr.io/datadoghq/agent:latest
+    image: gcr.io/datadoghq/agent:7
     container_name: datadog-agent
+    env_file:
+      - ./.env
     environment:
       - DD_API_KEY=${DD_API_KEY}
-      - DD_SITE=us5.datadoghq.com
+      - DD_SITE=${DD_SITE}
+      # APM / traces
       - DD_APM_ENABLED=true
       - DD_APM_NON_LOCAL_TRAFFIC=true
+      # Perfilado y métricas de runtime
       - DD_PROFILING_ENABLED=true
-      - DD_LOGS_ENABLED=false        # ← desactiva recolección de logs de contenedores por ahora
+      - DD_RUNTIME_METRICS_ENABLED=true
+      # Logs de contenedores (apagado por ahora)
+      - DD_LOGS_ENABLED=false
+      # DogStatsD accesible desde fuera
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      # OTLP HTTP (para apps con OpenTelemetry)
       - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT=0.0.0.0:4318
     ports:
       - "8126:8126/tcp"   # APM (traces)
       - "8125:8125/udp"   # DogStatsD (metrics)
-      - "4318:4318/tcp"   # OTLP HTTP (traces and metrics)
-    # Montajes útiles; no son obligatorios, pero ayudan en healthchecks/metrics
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc/:/host/proc/:ro
-      - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+      - "4318:4318/tcp"   # OTLP HTTP (traces/metrics/logs)
     restart: unless-stopped
+
+    # Primero arranca SIN volúmenes (en Windows/WSL pueden tumbar el contenedor)
+    # Añádelos después de validar que arranca:
+    # volumes:
+    #   - /var/run/docker.sock:/var/run/docker.sock:ro
+    #   - /proc/:/host/proc/:ro
+    #   - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
