@@ -26,9 +26,15 @@ jobs:
           - messages-service
           - notifications-service
           - parameters-service
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Validar artefactos AI
+        run: |
+          chmod +x scripts/check-ai-artifacts.sh
+          bash scripts/check-ai-artifacts.sh
 
       - name: Set up Temurin JDK
         uses: actions/setup-java@v4
@@ -110,9 +116,15 @@ jobs:
           - messages-service
           - notifications-service
           - parameters-service
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Validar artefactos AI
+        run: |
+          chmod +x scripts/check-ai-artifacts.sh
+          bash scripts/check-ai-artifacts.sh
 
       - name: Set up Temurin JDK
         uses: actions/setup-java@v4
@@ -183,7 +195,7 @@ jobs:
           if [ "${TRIVY_RESULT}" != "success" ]; then
             echo "Security scan stage did not complete successfully"
             exit 1
-          fi
+          }
 
       - name: Set gate output
         id: gate
@@ -206,6 +218,7 @@ jobs:
           - messages-service
           - notifications-service
           - parameters-service
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

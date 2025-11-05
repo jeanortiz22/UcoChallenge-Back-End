@@ -12,7 +12,7 @@ import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.
     uses = { IdTypeReferenceMapper.class, CityReferenceMapper.class },
     builder = @Builder(disableBuilder = false)
 )
-public interface RegisterUserEntityMapper{
+public interface RegisterUserEntityMapper {
 
 	@Mapping(source = "idType",   target = "idType")
     @Mapping(source = "homeCity", target = "homeCity")
